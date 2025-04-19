@@ -1,0 +1,60 @@
+/* FAQ.css */
+
+.faq-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.faq-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #1f2937;
+}
+
+.faq-list {
+  border-top: 1px solid #e5e7eb;
+}
+
+.faq-item {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+}
+
+.faq-question {
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  color: #111827;
+}
+
+.faq-answer {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #4b5563;
+  padding-left: 1rem;
+}
+
+.contact-box {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1rem;
+  background: #f3f4f6;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  color: #1f2937;
+}
+
+.contact-box a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.contact-box a:hover {
+  text-decoration: underline;
+}
