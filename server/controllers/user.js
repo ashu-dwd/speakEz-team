@@ -55,4 +55,25 @@ const handleUserSignin = async (req, res) => {
     }
 };
 
+const handleOtpVerification = async (req, res) => {
+const { email, otp } = req.body;
+
+try {
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(404).json({ error: "User not found" });
+    }
+    if (user.otp !== otp) {
+        return res.status(400).json({ error: "Invalid OTP" });
+    }
+    const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.status(200).json({
+        data: token,
+        message: "User signed in successfully"
+    });
+} catch (error) {
+    return res.status(500).json({ error: error.message });
+}
+}
+
 export { handleUserSignup, handleUserSignin };

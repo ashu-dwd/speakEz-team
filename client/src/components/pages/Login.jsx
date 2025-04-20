@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import './Login.css';
+import axios from 'axios';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,6 +17,14 @@ const Login = () => {
       remember,
     });
     // Add your login API call here
+    const response = axios.post('/api/user/login', {
+      email, password 
+    });
+    console.log('Response:', response.data);
+    if(response.data){
+      localStorage.setItem('token', response.data);
+      localStorage.setItem('authState', true);
+    }
   };
 
   return (
