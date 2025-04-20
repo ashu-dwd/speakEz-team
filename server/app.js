@@ -1,6 +1,8 @@
 import express from "express";
 import userRoute from './Routes/userRoute.js';
 import userDataRoute from './Routes/userDataRoute.js';
+import chatRoute from './Routes/chatRoute.js';
+import aiCharRoute from './Routes/aiCharRoute.js';
 import connectDB from "./connect.js";
 import verifyToken from "./Middlewares/auth.js";
 
@@ -21,6 +23,8 @@ app.use(express.json());
 //middleware for routes
 app.use('/api/user', userRoute);
 app.use('/api/userData', verifyToken, userDataRoute);
+app.use('/api/chat', verifyToken, chatRoute);
+app.use('/api/aiChar', aiCharRoute)
 
 
 app.listen(PORT, () => {
