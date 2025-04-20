@@ -1,72 +1,84 @@
-import React, { useState } from 'react';
-import './Signup.css';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../../Firebase"; 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import React, { useState } from "react";
+import "./Signup.css";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { auth } from "../../Firebase";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { updateProfile } from "firebase/auth";
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError('');
+    setError("");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
     createUserWithEmailAndPassword(auth, form.email, form.password)
-     .then((userCredential) => {
+      .then((userCredential) => {
         const user = userCredential.user;
-  
+
         // Store the display name
         updateProfile(user, {
-          displayName: form.name
-        }).then(() => {
-          console.log('User signed up:', user);
-          navigate("/verify-otp", { state: { email: form.email } });
-        }).catch((err) => {
-          console.error('Failed to update name:', err);
-          setError('Failed to update profile');
-        });
+          displayName: form.name,
+        })
+          .then(() => {
+            console.log("User signed up:", user);
+            navigate("/verify-otp", { state: { email: form.email } });
+          })
+          .catch((err) => {
+            console.error("Failed to update name:", err);
+            setError("Failed to update profile");
+          });
       })
       .catch((err) => {
         console.error(err);
         setError(err.message);
-      }); 
+      });
   };
-  
 
   const handleGoogleSignup = () => {
+    if (isLoading) return;
+    setIsLoading(true);
+
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
-        navigate("/verify-otp", { state: { email: form.email } });
+        navigate("/dashboard");
       })
       .catch((err) => {
         console.error(err);
-        setError(err.message);
-      }); 
+        if (err.code !== "auth/cancelled-popup-request") {
+          setError(err.message);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
-  
+
   return (
     <div className="signup-container">
       <form onSubmit={handleSubmit} className="signup-form">
@@ -114,15 +126,22 @@ const Signup = () => {
 
         {error && <p className="error-text">{error}</p>}
 
-        <button type="submit" className="signup-button">Create Account</button>
+        <button type="submit" className="signup-button">
+          {" "}
+          Create Account
+        </button>
 
         <div className="or-divider">OR</div>
 
-        <button type="button" className="google-button" onClick={handleGoogleSignup}>
-        <FontAwesomeIcon icon={faGoogle} style={{ marginRight: '8px' }} />
-          Continue with Google
+        <button
+          type="button"
+          className="google-button"
+          onClick={handleGoogleSignup}
+          disabled={isLoading}
+        >
+          <FontAwesomeIcon icon={faGoogle} style={{ marginRight: "8px" }} />
+          {isLoading ? "Loading..." : "Continue with google"}
         </button>
-
         <p className="signup-login-link">
           Already have an account? <a href="/login">Login</a>
         </p>

@@ -32,9 +32,6 @@ const App = () => {
         <Route path="/practicewithai" element={<Practicewithai/>} />
         <Route path="/Morecourse" element={<Morecourse/>}/>
         <Route path="/course/:courseId" element={<Coursedetail />} />
-
-        
-        
       </Routes>
       <Footer/>
     </>

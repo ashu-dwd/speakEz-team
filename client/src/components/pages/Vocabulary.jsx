@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Vocabulary.css";
 
 const vocabulary = [
@@ -120,15 +120,40 @@ const vocabulary = [
 ];
 
 const VocabularyBox = () => {
+  const [femaleVoice, setFemaleVoice] = useState(null);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(
+        (v) =>
+          v.name.includes("Female") ||
+          v.name.includes("Google US English") ||
+          v.name.includes("Samantha")
+      );
+      setFemaleVoice(voice || voices[0]); // fallback to first available voice
+    };
+
+    // Some browsers load voices asynchronously
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    loadVoices(); // Try to load immediately too
+  }, []);
+
   const speakWord = (word) => {
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = "en-US";
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
     window.speechSynthesis.speak(utterance);
   };
 
   return (
     <div className="vocab-container">
-      <h2>Vocabulary Box </h2>
+      <h2>Vocabulary Box</h2>
       <div className="vocab-list">
         {vocabulary.map((item, index) => (
           <div key={index} className="vocab-card">
@@ -148,3 +173,4 @@ const VocabularyBox = () => {
 };
 
 export default VocabularyBox;
+
