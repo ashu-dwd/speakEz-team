@@ -1,62 +1,180 @@
-/* Newsletter.css */
-
-.newsletter-container {
-  background: #f1f5f9;
-  padding: 3rem 1rem;
+.newsletter {
+  background: linear-gradient(to bottom, #4d46c5, #1e127c);
+  padding: 80px 20px;
   text-align: center;
-  border-radius: 1rem;
-  max-width: 600px;
-  margin: 3rem auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  color: white;
+  position: relative;
+  overflow: hidden;
 }
 
-.newsletter-title {
-  font-size: 1.75rem;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #1e293b;
-}
-
-.newsletter-desc {
-  color: #475569;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-}
-
-.newsletter-form {
+.newsletter-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   align-items: center;
+  gap: 20px;
 }
 
-.newsletter-input {
-  padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 999px;
-  width: 100%;
-  max-width: 400px;
-  font-size: 1rem;
-  outline: none;
+.newsletter-image .planet-circle {
+  background: linear-gradient(to bottom right, #0b0b1f, #00478c);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 10px solid white;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+  background-image: radial-gradient(circle at center, #2bd2ff, #00a7d5);
+  overflow: hidden;
 }
 
-.newsletter-button {
-  background-color: #2563eb;
+.pro-badge {
+  background-color: #ff924f;
   color: white;
-  padding: 0.75rem 2rem;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 14px;
+  font-size: 16px;
+  margin-top: 50px;
+  z-index: 2;
+}
+
+.newsletter h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.learn-more-btn {
+  background: linear-gradient(to right, #24c6ff, #3a8ef6);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 30px;
   border: none;
-  border-radius: 999px;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: 0.3s;
 }
 
-.newsletter-button:hover {
-  background-color: #1d4ed8;
+.learn-more-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #1ab9f0, #397ee0);
 }
 
-.success-message {
-  color: green;
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 1000px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: popupIn 0.3s ease-in-out;
+}
+
+@keyframes popupIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Packages Grid */
+.packages {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Package Card */
+.package-card {
+  flex: 1;
+  min-width: 250px;
+  background: linear-gradient(135deg, #5b2be3, #11002b);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.package-card:hover {
+  transform: translateY(-5px);
+}
+
+.package-card h4 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 1.1rem;
+}
+
+.package-card .price {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.package-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.package-card ul li {
+  margin-bottom: 0.5rem;
+}
+
+/* Choose Button */
+.choose-btn {
+  background: #ffffff;
+  color: #5b2be3;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.choose-btn:hover {
+  background: #f3f3f3;
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: transparent;
+  font-size: 20px;
+  color: #555;
+  border: none;
+  cursor: pointer;
 }

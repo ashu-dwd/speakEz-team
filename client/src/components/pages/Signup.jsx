@@ -1,11 +1,134 @@
-import React from 'react'
+import React, { useState } from 'react';
+import './Signup.css';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../Firebase"; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { updateProfile } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
+
 
 const Signup = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  const navigate = useNavigate();
 
-export default Signup
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    createUserWithEmailAndPassword(auth, form.email, form.password)
+     .then((userCredential) => {
+        const user = userCredential.user;
+  
+        // Store the display name
+        updateProfile(user, {
+          displayName: form.name
+        }).then(() => {
+          console.log('User signed up:', user);
+          navigate("/verify-otp", { state: { email: form.email } });
+        }).catch((err) => {
+          console.error('Failed to update name:', err);
+          setError('Failed to update profile');
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      }); 
+  };
+  
+
+  const handleGoogleSignup = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        navigate("/verify-otp", { state: { email: form.email } });
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      }); 
+  };
+  
+  return (
+    <div className="signup-container">
+      <form onSubmit={handleSubmit} className="signup-form">
+        <h2>Sign Up</h2>
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={form.name}
+          onChange={handleChange}
+          className="signup-input"
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="signup-input"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          className="signup-input"
+          required
+        />
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          className="signup-input"
+          required
+        />
+
+        {error && <p className="error-text">{error}</p>}
+
+        <button type="submit" className="signup-button">Create Account</button>
+
+        <div className="or-divider">OR</div>
+
+        <button type="button" className="google-button" onClick={handleGoogleSignup}>
+        <FontAwesomeIcon icon={faGoogle} style={{ marginRight: '8px' }} />
+          Continue with Google
+        </button>
+
+        <p className="signup-login-link">
+          Already have an account? <a href="/login">Login</a>
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default Signup;

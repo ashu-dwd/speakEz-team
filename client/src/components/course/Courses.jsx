@@ -1,5 +1,6 @@
 import React from 'react';
 import "./Courses.css"; 
+import { Link } from 'react-router-dom';
 
 const courses = [
   {
@@ -66,7 +67,7 @@ const courses = [
   },
 ];
 
-const Courses = () => {
+const Courses = () => { 
   return (
     <div className="course-container">
       <h2 className="course-title">📚 Courses We Offer</h2>
@@ -88,7 +89,9 @@ const Courses = () => {
         ))}
       </div>
       <div className="course-button-container">
-        <button className="course-button">Join Now</button>
+      <Link to="/Morecourse">
+  <button className="course-button">Join Now</button>
+</Link>
       </div>
     </div>
   );

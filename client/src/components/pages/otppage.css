@@ -1,0 +1,57 @@
+/* otpPage.css */
+
+.otp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f7fa;
+  padding: 20px;
+}
+
+.otp-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.otp-card h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.otp-card input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 10px 0 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.otp-card button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.otp-card button:hover {
+  background-color: #4338ca;
+}
+
+.otp-card p {
+  margin-top: 10px;
+  color: #555;
+  font-size: 14px;
+}

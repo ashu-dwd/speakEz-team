@@ -5,6 +5,7 @@ import Courses from '../course/Courses'
 import Student from '../student/Student'
 import Newsletter from '../Newsletter/Newsletter'
 import Faq from '../Faq/Faq'
+
 const Home = () => {
   return (
     <div>

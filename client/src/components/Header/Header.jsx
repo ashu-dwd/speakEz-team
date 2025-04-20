@@ -22,7 +22,7 @@ const navigate = useNavigate();
             </p>
           </div>
           <div className="header-right">
-            <button className="header-button"  onClick={() => navigate("/signup")}>Get Started</button>
+            <button className="header-button"  onClick={() => navigate("/Morecourse")}> Get Started</button>
           </div>
         </div>
       </div>

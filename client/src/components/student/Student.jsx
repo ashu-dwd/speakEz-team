@@ -1,58 +1,34 @@
-// StudentReviews.jsx
-import React from 'react';
-import './Student.css';
+import React from "react";
+import "./Student.css"; // Make sure to create this CSS file
 
 const reviews = [
   {
-    name: "Aisha Khan",
-    text: "I used to struggle with speaking English, but the AI practice helped me gain confidence!",
-    rating: 5,
-    location: "India",
+    text: "The best app I’ve ever used. I really improved my English with it. Not only pronunciation, fluency, intonation, word stress and listening. But also vocabulary and grammar in an active learning way that makes me feel better and more confident when I speak.",
   },
   {
-    name: "John Smith",
-    text: "The beginner course was super clear and simple to follow. Loved the interactive lessons!",
-    rating: 4,
-    location: "USA",
+    text: "I never thought I would be able to get rid of my strong accent... Then I discovered this app. It helped me identify issues with my pronunciation that I was not aware of... There’s already a vast improvement with my speech.",
   },
   {
-    name: "Li Wei",
-    text: "I practiced for my IELTS test with this site and improved my band score from 6.0 to 7.5!",
-    rating: 5,
-    location: "China",
+    text: "I love this app!! It helps me speak English fluently and fix my strong accent. I can see my improvement clearly after 3 months of use... when I try to speak in Google Translate, it is correct nearly 85% of the time, which is much more than before.",
   },
   {
-    name: "Fatima Ali",
-    text: "Great for learning on the go. I listen to lessons while commuting.",
-    rating: 4,
-    location: "UAE",
+    text: "This app is great. I’m that person that NEVER writes reviews. It’s that good... Amazing easy interface for everyday use, and great discounts; I bought the full version for a year. God bless you developers ❤️",
   },
 ];
 
 const Student = () => {
   return (
-    <div className="review-section">
-      <h2 className="review-title">🌟 What Our Students Say</h2>
-      <div className="review-grid">
+    <section className="review-section">
+      <h2>Anybody Can Speak English Confidently</h2>
+      <div className="review-container">
         {reviews.map((review, index) => (
-          <div className="review-card" key={index}>
-            <div className="review-header">
-              <div className="avatar">{review.name.charAt(0)}</div>
-              <div>
-                <h3>{review.name}</h3>
-                <span className="location">{review.location}</span>
-              </div>
-            </div>
-            <p className="review-text">“{review.text}”</p>
-            <div className="stars">
-              {Array.from({ length: review.rating }, (_, i) => (
-                <span key={i}>⭐</span>
-              ))}
-            </div>
+          <div key={index} className="review-card">
+            <span className="quote-icon">❝</span>
+            <p>{review.text}</p>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

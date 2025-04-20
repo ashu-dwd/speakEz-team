@@ -1,42 +1,56 @@
-import React from 'react';
-import './About.css';
+import React from "react";
+import "./About.css";
 
 const About = () => {
   return (
     <div className="about-container">
-      <h1 className="about-title">About Us</h1>
-
-      <p className="about-intro">
-        Welcome to <span className="highlight">LinguaLift</span> – your smart and friendly English learning companion!
-      </p>
-
-      <section className="about-section">
-        <h2 className="section-title">🎯 Our Mission</h2>
-        <p className="section-text">
-          To make English learning accessible, engaging, and enjoyable for learners of all ages and backgrounds.
+      <div className="about-card">
+        <h2 className="about-title">About Speak Ez</h2>
+        <p className="about-description">
+          Speak Ez is your personal English learning companion, designed to help
+          you master speaking, reading, and listening with ease. Whether you're a
+          beginner or looking to polish your fluency, our platform offers
+          interactive lessons, real-time feedback, and AI-powered speaking
+          practice.
         </p>
-      </section>
-
-      <section className="about-section">
-        <h2 className="section-title">🚀 What We Offer</h2>
-        <ul className="offer-list">
-          <li>📚 Structured lessons for all levels – beginner to advanced</li>
-          <li>🎮 Gamified learning paths that keep you motivated</li>
-          <li>🗣️ Practice tools for speaking, listening, reading & writing</li>
-          <li>🧩 Vocabulary builders and grammar guides</li>
-          <li>🧑‍🏫 Progress tracking and personalized feedback</li>
+        <ul className="about-list">
+          <li>🎯 Personalized learning paths tailored to your level</li>
+          <li>🧠 Smart speech analysis & correction using AI</li>
+          <li>🎤 5-minute daily speech challenges to boost fluency</li>
+          <li>📚 Engaging content from beginner to advanced</li>
+          <li>🏆 Progress tracking & achievement badges</li>
         </ul>
-      </section>
+        <button className="about-button">Start Learning Now</button>
+      </div>
 
-      <section className="about-section">
-        <h2 className="section-title">🌍 Why Choose Us?</h2>
-        <p className="section-text">
-          We believe language learning should never feel like a chore. That’s why we’ve created a platform that combines
-          smart technology, friendly guidance, and fun content to keep you coming back for more.
-        </p>
-      </section>
+      <div className="stats-section">
+        <h3 className="stats-title">Why Choose Speak Ez?</h3>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h4 className="stat-number">🌍 1000+</h4>
+            <p className="stat-text">Active Users</p>
+          </div>
+          <div className="stat-card">
+            <h4 className="stat-number">📘 2000+</h4>
+            <p className="stat-text">Vocabulary Words</p>
+          </div>
+          <div className="stat-card">
+            <h4 className="stat-number">📝 150+</h4>
+            <p className="stat-text">Grammar Lessons</p>
+          </div>
+          <div className="stat-card">
+            <h4 className="stat-number">🚀 Our Mission</h4>
+            <p className="stat-text">
+              To make English learning fun, accessible, and effective for all.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default About;
+
+
+
