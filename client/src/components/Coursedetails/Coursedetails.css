@@ -1,91 +1,107 @@
+/* Coursedetails.css */
+
 .course-detail-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 2rem auto;
-  padding: 1.5rem;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .course-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #2d2d2d;
+  font-size: 2.5rem;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
   text-align: center;
+  font-weight: bold;
 }
 
 .course-thumbnail {
-  width: 100%;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.course-thumbnail img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.course-meta {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #334155;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
 }
 
 .course-meta p {
-  margin: 0.5rem 0;
-  line-height: 1.6;
-  font-size: 1rem;
-  color: #444;
+  margin-bottom: 0.8rem;
 }
 
 .free-label {
-  background-color: #d1f7c4;
-  color: #256029;
   display: inline-block;
-  padding: 0.3rem 0.8rem;
-  margin-top: 1rem;
-  border-radius: 20px;
-  font-weight: bold;
+  background-color: #22c55e;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
 }
 
 .premium-label {
-  background-color: #ffe0e0;
-  color: #b20000;
   display: inline-block;
-  padding: 0.3rem 0.8rem;
-  margin-top: 1rem;
-  border-radius: 20px;
-  font-weight: bold;
+  background-color: #f97316;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
 }
 
 .enroll-btn {
-  margin-top: 1.5rem;
-  padding: 0.7rem 1.5rem;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s ease;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  padding: 1rem;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 2rem;
 }
 
 .enroll-btn:hover {
-  background: #0056b3;
+  background-color: #2563eb;
 }
 
 .student-reviews {
-  margin-top: 2.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #ddd;
+  background-color: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 1rem;
 }
 
 .student-reviews h2 {
-  margin-bottom: 1rem;
   font-size: 1.5rem;
-  color: #2b2b2b;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .student-reviews ul {
-  padding-left: 1.2rem;
+  list-style: none;
+  padding: 0;
 }
 
 .student-reviews li {
-  margin-bottom: 0.6rem;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
   font-style: italic;
-  color: #555;
+  color: #1e293b;
 }

@@ -70,7 +70,7 @@ const courses = [
 const Courses = () => { 
   return (
     <div className="course-container">
-      <h2 className="course-title">📚 Courses We Offer</h2>
+      <h2 className="course-title">📚 Courses We Offer </h2>
       <div className="course-grid">
         {courses.map((course, index) => (
           <div className="course-card" key={index}>

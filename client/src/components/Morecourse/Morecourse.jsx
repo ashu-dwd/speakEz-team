@@ -1,6 +1,16 @@
 import React from "react";
 import "./Morecourse.css";
 import { Link, useNavigate } from "react-router-dom";
+import advancedSpeaking from '../../assets/AdvancedSpeakingEnglish.png';
+import businessCommunication from '../../assets/BusinessCommunication.png';
+import conversationalPractice from '../../assets/ConversationalPractice.png';
+import emailWriting from '../../assets/EmailWritingSkills.png';
+import englishForTravel from '../../assets/EnglishforTravel.png';
+import grammarEssentials from '../../assets/GrammarEssentials.png';
+import ieltsPreparation from '../../assets/IELTSPreparation.png';
+import pronunciationMastery from '../../assets/PronunciationMastery.png';
+import publicSpeaking from '../../assets/PublicSpeaking.png';
+import spokenEnglishBasic from '../../assets/SpokenEnglishBasic.png';
 
 const courses = [
   {
@@ -10,7 +20,7 @@ const courses = [
     isFree: true,
     price: "Free",
     rating: 4.5,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail: spokenEnglishBasic,
     description: "Learn how to introduce yourself, ask and answer basic questions in English.",
   },
   {
@@ -20,7 +30,7 @@ const courses = [
     isFree: false,
     price: "$49",
     rating: 4.8,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail: advancedSpeaking ,
     description: "Master complex conversations and gain fluency in advanced English topics.",
   },
   {
@@ -30,7 +40,7 @@ const courses = [
     isFree: true,
     price: "Free",
     rating: 4.6,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail:  grammarEssentials,
     description: "Strengthen your grammar knowledge for better speaking and writing skills.",
   },
   {
@@ -40,7 +50,8 @@ const courses = [
     isFree: false,
     price: "$39",
     rating: 4.7,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail: pronunciationMastery,
+        
     description: "Improve your pronunciation and sound more natural in English conversations.",
   },
   {
@@ -50,7 +61,7 @@ const courses = [
     isFree: false,
     price: "$59",
     rating: 4.9,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail:  businessCommunication,
     description: "Learn to communicate confidently in professional business settings.",
   },
   {
@@ -60,7 +71,7 @@ const courses = [
     isFree: false,
     price: "$99",
     rating: 4.8,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail:  ieltsPreparation,
     description: "Get ready for IELTS with tips, practice tests, and expert strategies.",
   },
   {
@@ -70,7 +81,7 @@ const courses = [
     isFree: false,
     price: "$45",
     rating: 4.6,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail: publicSpeaking,
     description: "Build confidence and learn to speak effectively in front of an audience.",
   },
   {
@@ -80,7 +91,7 @@ const courses = [
     isFree: true,
     price: "Free",
     rating: 4.4,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail: conversationalPractice,
     description: "Practice real-life conversations to improve fluency and comprehension.",
   },
   {
@@ -90,7 +101,7 @@ const courses = [
     isFree: false,
     price: "$29",
     rating: 4.3,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail:  englishForTravel,
     description: "Essential English phrases and vocabulary for traveling the world.",
   },
   {
@@ -100,7 +111,7 @@ const courses = [
     isFree: false,
     price: "$35",
     rating: 4.7,
-    thumbnail: "https://via.placeholder.com/150",
+    thumbnail: emailWriting,
     description: "Write professional emails with proper etiquette and structure.",
   },
 ];
