@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { auth } from "../Firebase";
 
-const Navbar = () => {
+const Navbar = ({isAdmin}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
