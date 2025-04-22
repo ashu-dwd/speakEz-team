@@ -12,17 +12,27 @@ const Navbar = ({isAdmin}) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsLoggedIn(!!user);
+  useEffect(() => { 
+   const unsubscribe = auth.onAuthStateChanged((user) => {
+    const token = localStorage.getItem("token");
+    if (user || token){
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
     });
     return () => unsubscribe();
   }, []);
 
   const handleLogout = () => {
-    auth.signOut();
+    auth.signOut()
+    .then(() => { 
+     localStorage.clear(); 
+     setIsLoggedIn(false);
     navigate("/login");
-  };
+ })
+ .cauth((err) => console.error("Logout Error :", err));
+ };
 
   return (
     <nav className="navbar">

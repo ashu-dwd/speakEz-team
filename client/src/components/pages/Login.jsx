@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import "./Login.css";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ const Login = () => {
         localStorage.setItem("token", data);
         localStorage.setItem("authState", "true");
         alert(message || "Login successful!");
-        Navigate("/dashboard");
+        navigate("/dashboard");
       } else {
         alert("Unexpected response format.");
       }
