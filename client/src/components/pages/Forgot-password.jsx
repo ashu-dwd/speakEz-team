@@ -1,13 +1,22 @@
 // ForgotPassword.jsx
-import React, { useState } from 'react';
+import axios from "axios";
+import React, { useState } from "react";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    console.log('Sending password reset to:', email);
-    // Call backend API to send reset email
+    console.log("Sending password reset to:", email);
+    const response = await axios.post(
+      "http://localhost:5000/api/user/forgot-password",
+      { email }
+    );
+    if (response.data.success) {
+      alert(response.data.message);
+    } else {
+      alert(response.data.error);
+    }
   };
 
   return (
@@ -22,7 +31,9 @@ const ForgotPassword = () => {
           className="login-input"
           required
         />
-        <button type="submit" className="login-button">Send Reset Link</button>
+        <button type="submit" className="login-button">
+          Send Reset Link
+        </button>
       </form>
     </div>
   );
