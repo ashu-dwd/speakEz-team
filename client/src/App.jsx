@@ -27,6 +27,7 @@ import Aicharacter from "./components/Aicharacter/Aicharacter";
 import Verifyotp from "./components/pages/Verifyotp";
 import Payment from "./components/Payment/Payment";
 import ResetPassword from "./components/Resetpassword/Resetpassword";
+import VoiceInterface from "./components/pages/voiceInterface";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -65,6 +66,7 @@ const App = () => {
         <Route path="/aicharacter" element={<Aicharacter isAdmin={true} />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/voice-interface" element={<VoiceInterface />} />
       </Routes>
       <Footer />
     </>
