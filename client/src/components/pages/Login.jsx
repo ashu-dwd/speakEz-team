@@ -10,6 +10,26 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
+    console.log("Logging in with:", {
+      email,
+      password,
+      remember,
+    });
+    // Add your login API call here
+    const response =  axios.post("http://localhost:5000/api/user/login", {
+      email,
+      password,
+    });
+    console.log("Response:", response.data);
+    if (response.data) {
+      localStorage.setItem("token", response.data.data);
+      localStorage.setItem("authState", true);
+      alert("Login successful!");
+      Navigate("/dashboard");
+    } else {
+      alert(response.data.error);
+=======
     console.log("Logging in with:", { email, password, remember });
 
     try {
@@ -38,6 +58,7 @@ const Login = () => {
       } else {
         alert("Something went wrong. Please try again.");
       }
+>>>>>>> 48eb059a84f0673a3a5c89f7df305ea34c9603d6
     }
   };
 
