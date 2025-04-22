@@ -22,6 +22,7 @@ import BlogDetails from './components/Blog/BlogDetails';
 import Aicharacter from './components/Aicharacter/Aicharacter';
 import Verifyotp from './components/pages/Verifyotp';
 import Payment from './components/payment/Payment';
+import ResetPassword from './components/Resetpassword/Resetpassword';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -60,6 +61,7 @@ const App = () => {
         <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/aicharacter" element={<Aicharacter isAdmin={true} />} />
         <Route path='/payment' element={<Payment/>}/>
+        <Route path='/resetpassword' element={<ResetPassword/>}/>
       </Routes>
       <Footer />
     </>

@@ -8,8 +8,9 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     console.log("Logging in with:", {
       email,
       password,
@@ -28,6 +29,36 @@ const Login = () => {
       Navigate("/dashboard");
     } else {
       alert(response.data.error);
+=======
+    console.log("Logging in with:", { email, password, remember });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/user/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      const { data, message } = response.data;
+
+      if (data) {
+        localStorage.setItem("token", data);
+        localStorage.setItem("authState", "true");
+        alert(message || "Login successful!");
+        Navigate("/dashboard");
+      } else {
+        alert("Unexpected response format.");
+      }
+    } catch (error) {
+      // console.error("Login error:", error);
+      if (error.response && error.response.data && error.response.data.error) {
+        alert(error.response.data.error);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+>>>>>>> 48eb059a84f0673a3a5c89f7df305ea34c9603d6
     }
   };
 
