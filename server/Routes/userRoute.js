@@ -32,7 +32,7 @@ Router.post("/forgot-password", async (req, res) => {
         const passResetData = await PassReset.create({ email, token, resetLink, emailSent: true });
         await emailSender(email, "Password Reset", `Click here to reset: ${resetLink}`);
 
-        res.status(200).json({ message: "Reset link sent successfully" });
+        res.status(200).json({ message: "Reset link sent successfully", success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
