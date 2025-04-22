@@ -6,7 +6,7 @@ const contacts = [
     {
       name: "Raghavendra  Dwivedi ",
       role: "Technical support",
-      email: "raghav",
+      email: "dwivediji425@gmail.com",
       phone: "+91 8887948767"
     },
     {
