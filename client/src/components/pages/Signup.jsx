@@ -54,7 +54,7 @@ const Signup = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError(err.message);
+        setError(err.message); 
       });
   };
 

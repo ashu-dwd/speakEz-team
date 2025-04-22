@@ -2,6 +2,17 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Coursedetails.css';
 
+import advancedSpeaking from '../../assets/AdvancedSpeakingEnglish.png';
+import businessCommunication from '../../assets/BusinessCommunication.png';
+import conversationalPractice from '../../assets/ConversationalPractice.png';
+import emailWriting from '../../assets/EmailWritingSkills.png';
+import englishForTravel from '../../assets/EnglishforTravel.png';
+import grammarEssentials from '../../assets/GrammarEssentials.png';
+import ieltsPreparation from '../../assets/IELTSPreparation.png';
+import pronunciationMastery from '../../assets/PronunciationMastery.png';
+import publicSpeaking from '../../assets/PublicSpeaking.png';
+import spokenEnglishBasic from '../../assets/SpokenEnglishBasic.png';
+
 const courseData = [
   {
     id: '1',
@@ -10,7 +21,7 @@ const courseData = [
     description: 'Learn basic conversational English in this beginner-friendly course.',
     details: 'This course will help you master day-to-day conversational phrases, common greetings, and essential vocabulary for beginners.',
     isFree: true,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Spoken+English+Basics',
+    thumbnail: <img src={spokenEnglishBasic} alt="Spoken English Basic" />,
     reviews: [
       "⭐️⭐️⭐️⭐️⭐️ 'Perfect for beginners!' - Rahul",
       "⭐️⭐️⭐️⭐️ 'Very helpful and easy to follow.' - Meena"
@@ -23,7 +34,7 @@ const courseData = [
     description: 'Take your English skills to the next level with advanced techniques.',
     details: 'Focus on complex sentence structures, idiomatic expressions, and advanced vocabulary to improve fluency.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Advanced+English+Speaking',
+    thumbnail: <img src={advancedSpeaking} alt="Advanced Speaking English" />,
     reviews: [
       "⭐️⭐️⭐️⭐️ 'My speaking confidence improved drastically!' - Arjun",
       "⭐️⭐️⭐️⭐️⭐️ 'Loved the tips and fluency drills.' - Fatima"
@@ -36,7 +47,7 @@ const courseData = [
     description: 'Master the rules of English grammar with this essential guide.',
     details: 'Covering parts of speech, tenses, punctuation, and more to build a solid grammar foundation.',
     isFree: true,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Grammar+Essentials',
+    thumbnail: <img src={grammarEssentials} alt="Grammar Essentials" />,
     reviews: [
       "⭐️⭐️⭐️⭐️ 'Grammar finally makes sense!' - Kiran",
       "⭐️⭐️⭐️⭐️⭐️ 'Great examples and quizzes.' - Divya"
@@ -49,7 +60,7 @@ const courseData = [
     description: 'Improve your pronunciation for clearer communication.',
     details: 'Techniques and exercises to refine your accent and articulate better.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Pronunciation+Mastery',
+    thumbnail: <img src={pronunciationMastery} alt="Pronunciation Mastery" />,
     reviews: [
       "⭐️⭐️⭐️⭐️ 'Really helped me sound more fluent.' - Ali",
       "⭐️⭐️⭐️⭐️⭐️ 'Loved the native speaker comparisons!' - Sanya"
@@ -62,7 +73,7 @@ const courseData = [
     description: 'Learn how to speak and write effectively in professional settings.',
     details: 'Master workplace communication, business writing, and presentation skills.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Business+Communication',
+    thumbnail: <img src={businessCommunication} alt="Business Communication" />,
     reviews: [
       "⭐️⭐️⭐️⭐️⭐️ 'Perfect for my job!' - Anjali",
       "⭐️⭐️⭐️⭐️ 'Clear and practical content.' - Ramesh"
@@ -75,7 +86,7 @@ const courseData = [
     description: 'Prepare for your IELTS test with expert strategies and practice.',
     details: 'Includes practice questions, timing strategies, and scoring tips.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=IELTS+Preparation',
+    thumbnail: <img src={ieltsPreparation} alt="IELTS Preparation" />,
     reviews: [
       "⭐️⭐️⭐️⭐️⭐️ 'Helped me score 8 bands!' - Neha",
       "⭐️⭐️⭐️⭐️ 'Great mock test examples.' - Rohit"
@@ -88,7 +99,7 @@ const courseData = [
     description: 'Build confidence and become a persuasive public speaker.',
     details: 'Practice techniques for impactful speeches, managing nerves, and engaging audiences.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Public+Speaking',
+    thumbnail: <img src={publicSpeaking} alt="Public Speaking" />,
     reviews: [
       "⭐️⭐️⭐️⭐️⭐️ 'Now I can speak confidently!' - Aman",
       "⭐️⭐️⭐️⭐️ 'Really good for beginners.' - Sheetal"
@@ -101,7 +112,7 @@ const courseData = [
     description: 'Practice speaking English in real-life scenarios.',
     details: 'Interactive conversations for everyday situations and fluency.',
     isFree: true,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Conversational+Practice',
+    thumbnail: <img src={conversationalPractice} alt="Conversational Practice" />,
     reviews: [
       "⭐️⭐️⭐️⭐️ 'Fun way to learn!' - Priya",
       "⭐️⭐️⭐️⭐️⭐️ 'I practice daily now.' - Suresh"
@@ -114,7 +125,7 @@ const courseData = [
     description: 'Learn travel-related English to help you navigate the world.',
     details: 'Covers airport, hotel, restaurant, and sightseeing vocabulary and expressions.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=English+for+Travel',
+    thumbnail: <img src={englishForTravel} alt="English for Travel" />,
     reviews: [
       "⭐️⭐️⭐️⭐️⭐️ 'Used it on my Thailand trip!' - Kavita",
       "⭐️⭐️⭐️⭐️ 'Very practical and useful.' - Faizan"
@@ -122,15 +133,15 @@ const courseData = [
   },
   {
     id: '10',
-    title: 'Daily Vocabulary',
-    instructor: 'Emma Johnson',
-    description: 'Expand your vocabulary with daily words and usage.',
-    details: 'Learn 5 new words daily with examples and practice quizzes.',
+    title: 'E-mail Writing',
+    instructor: 'Chris Taylor',
+    description: 'Unlock the power of professional communication with our Email Writing Skills course.',
+    details: 'Learn to craft professional emails with clarity, tone, and structure. Master formatting, subject lines, salutations, and writing for different contexts such as work, academics, or casual use.',
     isFree: false,
-    thumbnail: 'https://via.placeholder.com/600x300?text=Daily+Vocabulary',
+    thumbnail: <img src={emailWriting} alt="Email Writing Skills" />,
     reviews: [
-      "⭐️⭐️⭐️⭐️ 'My vocab has improved!' - Tara",
-      "⭐️⭐️⭐️⭐️⭐️ 'Great daily habit builder.' - Dev"
+      "⭐️⭐️⭐️⭐️ 'Very useful for students.' - Tara",
+      "⭐️⭐️⭐️⭐️⭐️ 'Gives you a proper way of writing E-mails.' - Dev"
     ],
   },
 ];
@@ -155,7 +166,7 @@ const Coursedetail = () => {
   return (
     <div className="course-detail-container">
       <h1 className="course-title">{course.title}</h1>
-      <img src={course.thumbnail} alt={course.title} className="course-thumbnail" />
+      <div className="course-thumbnail">{course.thumbnail}</div>
 
       <div className="course-meta">
         <p><strong>Instructor:</strong> {course.instructor}</p>

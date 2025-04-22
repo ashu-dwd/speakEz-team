@@ -5,6 +5,20 @@
   font-family: "Segoe UI", sans-serif;
 }
 
+.footer li {
+  margin-bottom: 0.5rem;
+}
+
+.footer a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+
 .footer-columns {
   display: flex;
   flex-wrap: wrap;
@@ -19,6 +33,9 @@
   margin-bottom: 1rem;
 }
 
+a.link{
+  color: white;
+}
 .footer-col ul {
   list-style: none;
   padding: 0;

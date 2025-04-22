@@ -116,6 +116,7 @@
 .package-card {
   flex: 1;
   min-width: 250px;
+  height: 400px;
   background: linear-gradient(135deg, #5b2be3, #11002b);
   color: white;
   padding: 1.5rem;
@@ -142,7 +143,7 @@
 
 .package-card ul {
   list-style: none;
-  padding: 0;
+  padding: 30px;
   margin-bottom: 1rem;
   font-size: 0.95rem;
 }
