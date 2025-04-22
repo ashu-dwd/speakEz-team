@@ -1,29 +1,33 @@
-import React, { useState } from 'react';
-import './Login.css';
-import axios from 'axios';
-
+import React, { useState } from "react";
+import "./Login.css";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Logging in with:', {
+    console.log("Logging in with:", {
       email,
       password,
       remember,
     });
     // Add your login API call here
-    const response = axios.post('/api/user/login', {
-      email, password 
+    const response = axios.post("http://localhost:5000/api/user/login", {
+      email,
+      password,
     });
-    console.log('Response:', response.data);
-    if(response.data){
-      localStorage.setItem('token', response.data);
-      localStorage.setItem('authState', true);
+    console.log("Response:", response.data);
+    if (response.data) {
+      localStorage.setItem("token", response.data.data);
+      localStorage.setItem("authState", true);
+      alert("Login successful!");
+      Navigate("/dashboard");
+    } else {
+      alert(response.data.error);
     }
   };
 
@@ -59,10 +63,15 @@ const Login = () => {
             />
             Remember me
           </label>
-          <a href="/forgot-password"  className="forgot-password">Forgot password?</a>
+          <a href="/forgot-password" className="forgot-password">
+            Forgot password?
+          </a>
         </div>
 
-        <button type="submit" className="login-button"> Login</button>
+        <button type="submit" className="login-button">
+          {" "}
+          Login
+        </button>
       </form>
     </div>
   );

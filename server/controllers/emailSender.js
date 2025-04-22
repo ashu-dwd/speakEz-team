@@ -6,17 +6,17 @@ dotenv.config();
 async function emailSender(email, subject, text) {
     // Create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email", // Use gmail's SMTP if using Gmail
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
         auth: {
-            user: process.env.EMAIL_USER, // 👈 Secure via env
-            pass: process.env.EMAIL_PASS,
+            user: process.env.EMAIL_USER || 'dwivediji425@gmail.com',
+            pass: process.env.EMAIL_PASS || 'xjbi iyfv luob pnqi'
         },
     });
 
     const info = await transporter.sendMail({
-        from: `"Raghav Dwivedi 👻" <${process.env.EMAIL_USER}>`,
+        from: `"SpeakEz👻" <dwivediji425@gmail.com>`,
         to: email,
         subject: subject,
         text: text

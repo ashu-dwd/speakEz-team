@@ -1,5 +1,6 @@
 import express from "express";
 import userRoute from './Routes/userRoute.js';
+import cors from 'cors';
 import userDataRoute from './Routes/userDataRoute.js';
 import chatRoute from './Routes/chatRoute.js';
 import aiCharRoute from './Routes/aiCharRoute.js';
@@ -13,7 +14,8 @@ const PORT = process.env.PORT || 3000;
 
 //db connection
 connectDB();
-
+//cors
+app.use(cors());
 
 //middlewares for forms
 app.use(express.urlencoded({ extended: true }));

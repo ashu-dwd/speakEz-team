@@ -5,7 +5,7 @@ const Router = express.Router();
 
 
 Router.post('/signup', handleUserSignup);
-Router.post('/signin', handleUserSignin);
+Router.post('/login', handleUserSignin);
 Router.post('/deleteUser', (req, res) => { });
 Router.post('/updateUser', (req, res) => { });
 Router.post('/gen-otp', handleOtpGeneration)
