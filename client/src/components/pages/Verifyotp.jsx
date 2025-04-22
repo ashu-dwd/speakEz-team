@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./otpPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Verifyotp = () => {
@@ -52,13 +51,15 @@ const Verifyotp = () => {
   };
 
   return (
-    <form onSubmit={handleVerifyOtp}>
-      <h2>Verify OTP</h2>
+    <div className="otp-container"> 
+    <form onSubmit={handleVerifyOtp} className="otp-form" >
+      <h2 className="otp-title">Verify OTP</h2>
       {otpSent ? (
         <>
           {" "}
-          <p>OTP sent to {email}</p>
-          <input
+          <p className="otp-info">OTP sent to {email}</p>
+          <input 
+          className="otp-input"
             type="text"
             placeholder="Enter OTP"
             required
@@ -69,10 +70,11 @@ const Verifyotp = () => {
         </>
       ) : (
         <>
-          <p>Sending OTP to {email}...</p>
+          <p className="otp-loading">Sending OTP to {email}...</p>
         </>
       )}
     </form>
+    </div>
   );
 };
 
