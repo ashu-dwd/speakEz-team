@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Login.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -9,9 +9,23 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
 
+  // Auto-fill remembered email and redirect if already logged in
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberEmail");
+    const token = localStorage.getItem("token");
+
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRemember(true);
+    }
+
+    if (token) {
+      navigate("/dashboard"); // redirect if token is present
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password, remember });
 
     try {
       const response = await axios.post(
@@ -22,23 +36,28 @@ const Login = () => {
         }
       );
 
-      const { data, message } = response.data;
+      const { data, message, success } = response.data;
 
-      if (data) {
+      if (success && data) {
         localStorage.setItem("token", data);
         localStorage.setItem("authState", "true");
+
+        if (remember) {
+          localStorage.setItem("rememberEmail", email);
+        } else {
+          localStorage.removeItem("rememberEmail");
+        }
+
         alert(message || "Login successful!");
         navigate("/dashboard");
       } else {
-        alert("Unexpected response format.");
+        alert("Login failed. Please try again.");
       }
     } catch (error) {
-      // console.error("Login error:", error);
-      if (error.response && error.response.data && error.response.data.error) {
-        alert(error.response.data.error);
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
+      const errMsg =
+        error?.response?.data?.error ||
+        "Something went wrong. Please try again.";
+      alert(errMsg);
     }
   };
 
@@ -80,7 +99,6 @@ const Login = () => {
         </div>
 
         <button type="submit" className="login-button">
-          {" "}
           Login
         </button>
       </form>
