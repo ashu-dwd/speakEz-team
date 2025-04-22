@@ -15,7 +15,6 @@ import Dashboard from "./components/pages/Dashboard";
 import "./App.css";
 import Footer from "./components/Footer/Footer";
 import Navbar from "./components/Navbar";
-import Otppage from "./components/pages/otppage";
 import Practicewithai from "./components/pages/Practice";
 import Morecourse from "./components/Morecourse/Morecourse";
 import Coursedetail from "./components/Coursedetails/Coursedetails";
@@ -27,6 +26,7 @@ import BlogDetails from "./components/Blog/BlogDetails";
 import Aicharacter from "./components/Aicharacter/Aicharacter";
 import Verifyotp from "./components/pages/Verifyotp";
 import Payment from "./components/Payment/Payment";
+import ResetPassword from "./components/Resetpassword/Resetpassword";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -54,7 +54,6 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<Forgotpassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/gen-otp" element={<Otppage />} />
         <Route path="/verify-otp" element={<Verifyotp />} />
         <Route path="/practicewithai" element={<Practicewithai />} />
         <Route path="/Morecourse" element={<Morecourse />} />
@@ -65,6 +64,7 @@ const App = () => {
         <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/aicharacter" element={<Aicharacter isAdmin={true} />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </>

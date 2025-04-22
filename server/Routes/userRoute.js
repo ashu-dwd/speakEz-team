@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { handleUserSignup, handleUserSignin, handleOtpGeneration, handleOtpVerification } from "../controllers/user.js";
 import emailSender from "../controllers/emailSender.js";
+import PassReset from "../models/passReset.js";
 
 const Router = express.Router();
 
@@ -26,17 +27,33 @@ Router.post("/forgot-password", async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "15m" } // short expiry
         );
-
-        user.resetToken = token;
-        user.resetTokenExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
-        await user.save();
-
         const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password/${token}`;
+        const passResetData = await PassReset.create({ email, token, resetLink, emailSent: true });
         await emailSender(email, "Password Reset", `Click here to reset: ${resetLink}`);
 
         res.status(200).json({ message: "Reset link sent successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+Router.post("/verify-reset-token", async (req, res) => {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: "Token is required" });
+
+    try {
+        const tokenData = await PassReset.findOne({
+            token
+        });
+        console.log(tokenData);
+
+        if (!tokenData) {
+            return res.status(400).json({ error: "Invalid or expired token" });
+        }
+        return res.status(200).json({ message: "Token is valid", success: true });
+    } catch (error) {
+        console.error("Token verification error:", error);
+        return res.status(500).json({ error: "Server error" });
     }
 });
 Router.post("/reset-password/:token", async (req, res) => {
@@ -46,21 +63,17 @@ Router.post("/reset-password/:token", async (req, res) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({
-            _id: decoded.userId,
-            resetToken: token,
-            resetTokenExpires: { $gt: Date.now() }
+            _id: decoded.userId
         });
 
         if (!user) return res.status(400).json({ error: "Invalid or expired token" });
 
         user.password = await bcrypt.hash(newPassword, 10);
-        user.resetToken = undefined;
-        user.resetTokenExpires = undefined;
         await user.save();
 
-        res.status(200).json({ message: "Password reset successful" });
+        return res.status(200).json({ message: "Password reset successful" });
     } catch (err) {
-        res.status(400).json({ error: "Invalid or expired token" });
+        return res.status(400).json({ error: "Invalid or expired token" });
     }
 });
 

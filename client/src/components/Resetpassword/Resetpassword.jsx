@@ -1,19 +1,61 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./ResetPassword.css"; 
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import "./ResetPassword.css";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
+  const [validToken, setValidToken] = useState(false);
   const navigate = useNavigate();
+  const { token } = useParams();
 
-  const handleSkip = () => {
-    navigate("/dashboard");
+  useEffect(() => {
+    // Optional: check token validity from backend
+    const verifyToken = async () => {
+      try {
+        const res = await axios.post(
+          `http://localhost:5000/api/user/verify-reset-token`,
+          { token }
+        );
+        if (res.data.success) {
+          setValidToken(true);
+        } else {
+          alert("Token expired or invalid");
+          navigate("/login");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Invalid token");
+        navigate("/login");
+      }
+    };
+    if (token) verifyToken();
+    else navigate("/login");
+  }, [token, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!newPassword) return alert("Please enter a new password");
+
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/user/reset-password/${token}`,
+        {
+          newPassword,
+        }
+      );
+
+      if (res.data.success) {
+        alert(res.data.message);
+        navigate("/login");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || "Failed to reset password");
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("New password set to:", newPassword);
-    alert("Password updated!");
+  const handleSkip = () => {
     navigate("/dashboard");
   };
 
