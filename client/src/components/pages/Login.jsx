@@ -16,7 +16,7 @@ const Login = () => {
       remember,
     });
     // Add your login API call here
-    const response = axios.post("http://localhost:5000/api/user/login", {
+    const response =  axios.post("http://localhost:5000/api/user/login", {
       email,
       password,
     });
