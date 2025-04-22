@@ -124,7 +124,12 @@ const Morecourse = () => {
       alert(`Enrolled in ${course.title}! Redirecting to dashboard...`);
       navigate("/dashboard");
     } else {
-      navigate("/payment");
+      navigate("/payment", {
+        state:{
+          courseName:course.title,
+          price: course.price
+        }
+      });
     }
   };
 
