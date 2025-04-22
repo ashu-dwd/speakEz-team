@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import "./Signup.css";
-import {
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../Firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
-import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
@@ -35,27 +30,13 @@ const Signup = () => {
       setError("Passwords do not match");
       return;
     }
-    createUserWithEmailAndPassword(auth, form.email, form.password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-
-        // Store the display name
-        updateProfile(user, {
-          displayName: form.name,
-        })
-          .then(() => {
-            console.log("User signed up:", user);
-            navigate("/verify-otp", { state: { email: form.email } });
-          })
-          .catch((err) => {
-            console.error("Failed to update name:", err);
-            setError("Failed to update profile");
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message); 
-      });
+    navigate("/verify-otp", {
+      state: {
+        email: form.email,
+        name: form.name,
+        password: form.password,
+      },
+    });
   };
 
   const handleGoogleSignup = () => {
@@ -127,7 +108,6 @@ const Signup = () => {
         {error && <p className="error-text">{error}</p>}
 
         <button type="submit" className="signup-button">
-          {" "}
           Create Account
         </button>
 
@@ -140,8 +120,9 @@ const Signup = () => {
           disabled={isLoading}
         >
           <FontAwesomeIcon icon={faGoogle} style={{ marginRight: "8px" }} />
-          {isLoading ? "Loading..." : "Continue with google"}
+          {isLoading ? "Loading..." : "Continue with Google"}
         </button>
+
         <p className="signup-login-link">
           Already have an account? <a href="/login">Login</a>
         </p>

@@ -20,7 +20,6 @@ import Developer from './components/Developer/Developer';
 import Blog from './components/Blog/Blog';
 import BlogDetails from './components/Blog/BlogDetails'; 
 import Aicharacter from './components/Aicharacter/Aicharacter';
-import Payment from './components/payment/Payment';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -33,34 +32,34 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-const isAdmin = localStorage.getItem("role") === "admin";
+  const isAdmin = localStorage.getItem("role") === "admin";
 
   return (
-    <> 
-      <ScrollToTop/>
-      <Navbar isAdmin ={isAdmin}/>
+    <>
+      <ScrollToTop />
+      <Navbar isAdmin={isAdmin} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/vocabulary" element={<Vocabulary />} />
-        <Route path="/help" element={<Helpdesk/>} />
-        <Route path="/about" element={<About/>} />
+        <Route path="/help" element={<Helpdesk />} />
+        <Route path="/about" element={<About />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<Forgotpassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/verify-otp" element={<Otppage />} />
-        <Route path="/practicewithai" element={<Practicewithai/>} />
-        <Route path="/Morecourse" element={<Morecourse/>}/>
+        <Route path="/gen-otp" element={<Otppage />} />
+        <Route path="/verify-otp" element={<Verifyotp />} />
+        <Route path="/practicewithai" element={<Practicewithai />} />
+        <Route path="/Morecourse" element={<Morecourse />} />
         <Route path="/course/:courseId" element={<Coursedetail />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/developer" element={<Developer />} />
-        <Route path="/blog" element={<Blog/>}/>
-        <Route path="/blog/:id" element={<BlogDetails/>}/>
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/aicharacter" element={<Aicharacter isAdmin={true} />} />
         <Route path='/payment' element={<Payment/>}/>
       </Routes>
-      <Footer/>
-    
+      <Footer />
     </>
   );
 };
