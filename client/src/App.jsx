@@ -64,6 +64,7 @@ const App = () => {
         <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/aicharacter" element={<Aicharacter isAdmin={true} />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </>

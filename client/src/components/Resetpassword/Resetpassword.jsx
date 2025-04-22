@@ -44,7 +44,7 @@ const ResetPassword = () => {
           newPassword,
         }
       );
-
+      console.log(res.data);
       if (res.data.success) {
         alert(res.data.message);
         navigate("/login");
@@ -72,11 +72,11 @@ const ResetPassword = () => {
           required
         />
         <div className="reset-buttons">
-          <button type="button" onClick={handleSkip} className="reset-skip">
-            Skip New Password
+          <button type="submit" className="reset-skip">
+            Change Password
           </button>
-          <button type="submit" className="reset-submit">
-            Continue to Dashboard
+          <button type="button" className="reset-submit mb-3">
+            Continue to Dashboard(Skip)
           </button>
         </div>
       </form>
