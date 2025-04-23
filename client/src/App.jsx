@@ -12,7 +12,7 @@ import Signup from "./components/pages/Signup";
 import Login from "./components/pages/Login";
 import Forgotpassword from "./components/pages/Forgot-password";
 import Dashboard from "./components/pages/Dashboard";
-import "./App.css";
+//import "./App.css";
 import Footer from "./components/Footer/Footer";
 import Navbar from "./components/Navbar";
 import Practicewithai from "./components/pages/Practice";
