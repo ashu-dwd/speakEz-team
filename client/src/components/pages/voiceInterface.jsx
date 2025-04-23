@@ -8,9 +8,10 @@ export default function VoiceInterface() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [response, setResponse] = useState("");
+  const [suggestedReply, setSuggestedReply] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [roomId, setRoomId] = useState("");
-  const [charId, setCharId] = useState("");
+  const [charId, setCharId] = useState("q6zgrKfJ ");
 
   // const navigate = useNavigation();
   const recognitionRef = useRef(null);
@@ -18,11 +19,16 @@ export default function VoiceInterface() {
 
   const location = useLocation();
 
+  // useEffect(() => {
+  //   if (location.state?.charId) {
+  //     setCharId(location.state.charId || "q6zgrKfJ");
+  //   }
+  // }, [location.state]);
+
+  //for testing
   useEffect(() => {
-    if (location.state?.charId) {
-      setCharId(location.state.charId);
-    }
-  }, [location.state]);
+    setCharId("q6zgrKfJ");
+  }, []);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -64,9 +70,10 @@ export default function VoiceInterface() {
   //fetching the roomId from the backend
   useEffect(() => {
     const fetchRoomId = async () => {
+      console.log(charId);
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/chat",
+          `http://localhost:5000/api/chat`,
           { charId },
           {
             headers: {
@@ -88,21 +95,21 @@ export default function VoiceInterface() {
   const sendToBackend = async (text) => {
     setIsLoading(true);
     try {
-      // Mock API call - replace with your actual backend endpoint
-      // const response = await fetch('https://your-backend-api/speech', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ text })
-      // });
-      // const data = await response.json();
+      const response = await axios.post(
+        `http://localhost:5000/api/chat/${charId}/WhvvQvBtBm`,
+        { userMsg: text },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-      // Simulate backend response with timeout
-      setTimeout(() => {
-        const mockResponse = `I heard you say: "${text}"`;
-        setResponse(mockResponse);
-        speakResponse(mockResponse);
-        setIsLoading(false);
-      }, 1000);
+      setResponse(response.data.charResponse.mainResponse);
+      setSuggestedReply(response.data.charResponse.suggestedReply);
+      speakResponse(response.data.charResponse.mainResponse);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error sending to backend:", error);
       setIsLoading(false);

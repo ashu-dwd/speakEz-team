@@ -1,38 +1,32 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import logo from "../../public/favicon.jpg";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import logo from "/favicon.jpg";
 import "./Navbar.css";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { auth } from "../Firebase";
+import { useAuth } from "../context/authContext";
 
+<<<<<<< HEAD
 const Navbar = ({isAdmin}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
+=======
+const Navbar = ({ isAdmin }) => {
+>>>>>>> 92bc8b0737aed62b06cc6caad2b8d107c66b30d4
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const { user, setUser } = useAuth();
 
-  useEffect(() => { 
-   const unsubscribe = auth.onAuthStateChanged((user) => {
-    const token = localStorage.getItem("token");
-    if (user || token){
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
+  const isLoggedIn = !!user;
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      localStorage.clear();
+      setUser(null);
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout Error:", err);
     }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = () => {
-    auth.signOut()
-    .then(() => { 
-     localStorage.clear(); 
-     setIsLoggedIn(false);
-    navigate("/login");
- })
- .cauth((err) => console.error("Logout Error :", err));
- };
+  };
 
   return (
     <nav className="navbar">
@@ -41,41 +35,29 @@ const Navbar = ({isAdmin}) => {
       </Link>
 
       <ul className="navbar-nav">
-        <li>
-          <Link to="/" className="nav-link">
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link to="/vocabulary" className="nav-link">
-            {" "}
-            Vocabulary
-          </Link>
-        </li>
-        <li>
-          <Link to="/about" className="nav-link">
-            About{" "}
-          </Link>
-        </li>
-        <li>
-          <Link to="/help" className="nav-link">
-            Help Desk
-          </Link>
-        </li>
-        <li>
-          <Link to="/practicewithai" className="nav-link">
-            {" "}
-            Practice with AI{" "}
-          </Link>
-        </li>
+        {[
+          { path: "/", label: "Home" },
+          { path: "/vocabulary", label: "Vocabulary" },
+          { path: "/about", label: "About" },
+          { path: "/help", label: "Help Desk" },
+          { path: "/practicewithai", label: "Practice with AI" },
+        ].map(({ path, label }) => (
+          <li key={path}>
+            <Link to={path} className="nav-link">
+              {label}
+            </Link>
+          </li>
+        ))}
 
         {isAdmin && (
           <li>
-            {" "}
-            <Link to="/aicharacter">Create AI Character </Link>
+            <Link to="/aicharacter" className="nav-link">
+              Create AI Character
+            </Link>
           </li>
         )}
       </ul>
+
       {!isLoggedIn ? (
         <div className="auth-buttons">
           <Link to="/signup" className="btn btn-light">
@@ -88,7 +70,7 @@ const Navbar = ({isAdmin}) => {
       ) : (
         <div className="dropdown">
           <button
-            onClick={() => setShowDropdown(!showDropdown)}
+            onClick={() => setShowDropdown((prev) => !prev)}
             className="dropdown-toggle"
           >
             Account ▾
@@ -106,26 +88,3 @@ const Navbar = ({isAdmin}) => {
 };
 
 export default Navbar;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
