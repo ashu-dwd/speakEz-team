@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { auth } from "../Firebase";
 
 const Navbar = ({isAdmin}) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 

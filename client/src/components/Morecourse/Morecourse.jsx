@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import "./Morecourse.css";
 import { Link, useNavigate } from "react-router-dom";
 import advancedSpeaking from '../../assets/AdvancedSpeakingEnglish.png';
@@ -118,8 +119,23 @@ const courses = [
 
 const Morecourse = () => {
   const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+
+  const handleLoadCourses = () => {
+    setCourses(allCourses);
+    setLoaded(true);
+  };
 
   const handleEnroll = (course) => {
+    const enrolled = JSON.parse(localStorage.getItem("enrolledCourses")) || [];
+
+  // Check if course is already enrolled
+  const alreadyEnrolled = enrolled.find(c => c.id === course.id);
+  if (!alreadyEnrolled) {
+    enrolled.push(course);
+    localStorage.setItem("enrolledCourses", JSON.stringify(enrolled));
+  }
     if (course.isFree) {
       alert(`Enrolled in ${course.title}! Redirecting to dashboard...`);
       navigate("/dashboard");

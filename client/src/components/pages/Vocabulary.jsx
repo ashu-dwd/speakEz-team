@@ -81,7 +81,7 @@ const VocabularyBox = () => {
           <div key={index} className="vocab-card">
             <div className="word-row">
               <h3 className="word">{item.word}</h3>
-              <button onClick={() => speakWord(item.word)}>🔊</button>
+              <button className="speak-btn"  onClick={() => speakWord(item.word)}>🔊</button>
             </div>
             <p><strong>Meaning:</strong> {item.meaning}</p>
             <p><strong>Example:</strong> <em>{item.sentence}</em></p>
