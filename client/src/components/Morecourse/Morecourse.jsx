@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Morecourse.css";
 import { Link, useNavigate } from "react-router-dom";
 import advancedSpeaking from '../../assets/AdvancedSpeakingEnglish.png';
@@ -13,7 +13,7 @@ import pronunciationMastery from '../../assets/PronunciationMastery.png';
 import publicSpeaking from '../../assets/PublicSpeaking.png';
 import spokenEnglishBasic from '../../assets/SpokenEnglishBasic.png';
 
-const courses = [
+ const allCourses = [
   {
     id: "1",
     title: "Spoken English Basics",
@@ -122,10 +122,15 @@ const Morecourse = () => {
   const [courses, setCourses] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
+  useEffect(() => {
+    setCourses(allCourses);
+  }, []);
+
   const handleLoadCourses = () => {
     setCourses(allCourses);
     setLoaded(true);
   };
+
 
   const handleEnroll = (course) => {
     const enrolled = JSON.parse(localStorage.getItem("enrolledCourses")) || [];
@@ -175,4 +180,5 @@ const Morecourse = () => {
 };
 
 export default Morecourse;
+
 

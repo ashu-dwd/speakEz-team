@@ -1,753 +1,665 @@
-<<<<<<< HEAD
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-const Dashboard = () => {
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [courses, setCourses] = useState([]);
-
-  const [aiName, setAiName] = useState("");
-  const [aiDescription, setAiDescription] = useState("");
-  const [aiImage, setAiImage] = useState("");
-  const [aiPersonality, setAiPersonality] = useState("");
-=======
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Search,
-  Filter,
-  Users,
-  Grid,
-  List,
-  ChevronDown,
-  X,
-  Menu,
+  MessageSquare,
+  Book,
+  User,
+  Mail,
+  LogOut,
+  Moon,
+  Sun,
+  Settings,
   Star,
-  StarOff,
-  Info,
+  Search,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-// Sample AI character data
-const aiCharacters = [
-  {
-    id: 1,
-    name: "Morgan Analyst",
-    type: "Businessman",
-    description: "Financial expert AI assistant with corporate knowledge",
-    image: "/api/placeholder/300/300",
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    name: "Professor Ada",
-    type: "Teacher",
-    description: "Patient educator focused on academic subjects",
-    image: "/api/placeholder/300/300",
-    rating: 4.9,
-  },
-  {
-    id: 3,
-    name: "Chef Oliver",
-    type: "Creative",
-    description: "Culinary expert with thousands of recipes",
-    image: "/api/placeholder/300/300",
-    rating: 4.7,
-  },
-  {
-    id: 4,
-    name: "Dr. Watson",
-    type: "Medical",
-    description: "Healthcare assistant with medical knowledge",
-    image: "/api/placeholder/300/300",
-    rating: 4.6,
-  },
-  {
-    id: 5,
-    name: "Coach Alex",
-    type: "Fitness",
-    description: "Personal trainer with customized workout plans",
-    image: "/api/placeholder/300/300",
-    rating: 4.5,
-  },
-  {
-    id: 6,
-    name: "Emma Writer",
-    type: "Creative",
-    description: "Storyteller and content creation assistant",
-    image: "/api/placeholder/300/300",
-    rating: 4.8,
-  },
-  {
-    id: 7,
-    name: "Tech Support Tim",
-    type: "Technical",
-    description: "IT troubleshooter and technology guide",
-    image: "/api/placeholder/300/300",
-    rating: 4.3,
-  },
-  {
-    id: 8,
-    name: "Legal Lucy",
-    type: "Businessman",
-    description: "Legal assistant with contract knowledge",
-    image: "/api/placeholder/300/300",
-    rating: 4.7,
-  },
-];
->>>>>>> 92bc8b0737aed62b06cc6caad2b8d107c66b30d4
+function Dashboard() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [activePage, setActivePage] = useState("courses");
+  const [selectedCharacter, setSelectedCharacter] = useState(2); // Professor Ada selected by default
+  const [searchQuery, setSearchQuery] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const handleSignOut = () => {
+    navigate("/login");
+  };
+  const handleLoadCourses = () => {
+    navigate("/Morecourse");
+  };
 
-export default function AICharactersDashboard() {
-  const [viewMode, setViewMode] = useState("grid");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("All");
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [favorites, setFavorites] = useState([]);
-  const [selectedCharacter, setSelectedCharacter] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [sortOption, setSortOption] = useState("name-asc");
-  const [isMobile, setIsMobile] = useState(false);
+  // Mock user data
+  const userData = {
+    username: "AlexJohnson",
+    email: "alex.johnson@example.com",
+  };
 
-  // Detect screen size for responsive behavior
+  // Effect to simulate fetching courses from external source
   useEffect(() => {
-<<<<<<< HEAD
-    const fetchUserAndAI = async () => {
+    const fetchEnrolledCourses = () => {
+      setLoading(true);
       try {
-        const userRes = await axios.get("http://localhost:5000/api/user");
-        setUserName(userRes.data.name);
-        setUserEmail(userRes.data.email);
-
-        const aiRes = await axios.get("http://localhost:5000/api/ai");
-        const aiData = aiRes.data;
-        setAiName(aiData.name);
-        setAiDescription(aiData.description);
-        setAiImage(aiData.image);
-        setAiPersonality(aiData.personality);
+        const enrolled =
+          JSON.parse(localStorage.getItem("enrolledCourses")) || [];
+        setCourses(enrolled);
       } catch (error) {
-        console.error("Error fetching user or AI data:", error);
+        console.error("Error loading enrolled courses:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserAndAI();
-
-    const enrolled = JSON.parse(localStorage.getItem("enrolledCourses")) || [];
-    setCourses(enrolled);
+    fetchEnrolledCourses();
   }, []);
 
-  return (
-    <div className='user-info'>
-      <h1>Welcome</h1>
-      <h2>Name: {userName}</h2>
-      <h2>Email: {userEmail}</h2>
-
-      {courses.length > 0 && (
-        <div className='course'>
-          <h1>Your Courses</h1>
-          {courses.map((course) => (
-            <div key={course.id}>
-              <h3>{course.title}</h3>
-              <p>{course.description}</p>
-            </div>
-          ))}
-=======
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setMobileFiltersOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Initialize on mount
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Get unique character types for filter dropdown
-  const characterTypes = [
-    "All",
-    ...new Set(aiCharacters.map((char) => char.type)),
+  // AI Characters
+  const aiCharacters = [
+    {
+      id: 1,
+      name: "Morgan Analyst",
+      type: "Businessman",
+      description: "Financial expert AI assistant with corporate knowledge",
+      image: "/api/placeholder/300/300",
+      rating: 4.8,
+      avatar: "👨‍💼",
+    },
+    {
+      id: 2,
+      name: "Professor Ada",
+      type: "Teacher",
+      description: "Patient educator focused on academic subjects",
+      image: "/api/placeholder/300/300",
+      rating: 4.9,
+      avatar: "👩‍🏫",
+    },
+    {
+      id: 3,
+      name: "Chef Oliver",
+      type: "Creative",
+      description: "Culinary expert with thousands of recipes",
+      image: "/api/placeholder/300/300",
+      rating: 4.7,
+      avatar: "👨‍🍳",
+    },
+    {
+      id: 4,
+      name: "Dr. Watson",
+      type: "Medical",
+      description: "Healthcare assistant with medical knowledge",
+      image: "/api/placeholder/300/300",
+      rating: 4.6,
+      avatar: "👨‍⚕️",
+    },
+    {
+      id: 5,
+      name: "Coach Alex",
+      type: "Fitness",
+      description: "Personal trainer with customized workout plans",
+      image: "/api/placeholder/300/300",
+      rating: 4.5,
+      avatar: "🏋️‍♀️",
+    },
+    {
+      id: 6,
+      name: "Emma Writer",
+      type: "Creative",
+      description: "Storyteller and content creation assistant",
+      image: "/api/placeholder/300/300",
+      rating: 4.8,
+      avatar: "✍️",
+    },
+    {
+      id: 7,
+      name: "Tech Support Tim",
+      type: "Technical",
+      description: "IT troubleshooter and technology guide",
+      image: "/api/placeholder/300/300",
+      rating: 4.3,
+      avatar: "👨‍💻",
+    },
+    {
+      id: 8,
+      name: "Legal Lucy",
+      type: "Businessman",
+      description: "Legal assistant with contract knowledge",
+      image: "/api/placeholder/300/300",
+      rating: 4.7,
+      avatar: "⚖️",
+    },
   ];
 
-  // Toggle favorite status
-  const toggleFavorite = (id) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]
-    );
-  };
-
-  // Handle character selection
-  const handleSelectCharacter = (character) => {
-    setSelectedCharacter(character);
-    setShowModal(true);
-  };
-
-  // Sort and filter characters
-  const sortedAndFilteredCharacters = [...aiCharacters]
-    .filter((character) => {
-      const matchesSearch =
-        character.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        character.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType =
-        selectedType === "All" || character.type === selectedType;
-      return matchesSearch && matchesType;
-    })
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name-asc":
-          return a.name.localeCompare(b.name);
-        case "name-desc":
-          return b.name.localeCompare(a.name);
-        case "rating-high":
-          return b.rating - a.rating;
-        case "rating-low":
-          return a.rating - b.rating;
-        default:
-          return 0;
-      }
-    });
-
-  // Group characters by type
-  const groupedCharacters = sortedAndFilteredCharacters.reduce(
-    (groups, character) => {
-      if (!groups[character.type]) {
-        groups[character.type] = [];
-      }
-      groups[character.type].push(character);
-      return groups;
-    },
-    {}
+  // Filter characters based on search
+  const filteredCharacters = aiCharacters.filter(
+    (char) =>
+      char.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      char.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      char.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get the selected character
+  const currentCharacter = aiCharacters.find(
+    (char) => char.id === selectedCharacter
+  );
+
+  // Sample messages for each character
+  const getCharacterMessages = (charId) => {
+    const messages = {
+      1: "Let's analyze your financial portfolio. I notice some potential for optimizing your investments.",
+      2: "Welcome back to our learning session! Would you like to continue with React hooks?",
+      3: "I found some delicious recipes based on the ingredients you have. Shall we cook something special?",
+      4: "Remember to maintain a healthy lifestyle. What health topics can I help you with today?",
+      5: "Great job with your fitness progress! Ready for today's workout plan?",
+      6: "I've drafted the story outline you requested. Let's review the character development.",
+      7: "Your system diagnostics look good. Any technical issues I can help troubleshoot?",
+      8: "I've reviewed the contract clauses you sent. Let me summarize the key legal points.",
+    };
+    return messages[charId] || "How can I assist you today?";
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile Filters Drawer */}
-      {mobileFiltersOpen && (
-        <div className="fixed inset-0 z-40 flex md:hidden">
-          <div
-            className="fixed inset-0 bg-black bg-opacity-25"
-            onClick={() => setMobileFiltersOpen(false)}
-          ></div>
-          <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
-            <div className="flex items-center justify-between px-4">
-              <h2 className="text-lg font-medium text-gray-900">Filters</h2>
-              <button
-                type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-                onClick={() => setMobileFiltersOpen(false)}
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            {/* Mobile Filter Options */}
-            <div className="px-4 mt-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                Character Type
-              </h3>
-              <div className="mt-2 space-y-2">
-                {characterTypes.map((type) => (
-                  <div key={type} className="flex items-center">
-                    <button
-                      className={`px-3 py-2 text-sm font-medium rounded-md w-full text-left 
-                      ${
-                        selectedType === type
-                          ? "bg-blue-100 text-blue-800"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                      onClick={() => {
-                        setSelectedType(type);
-                        setMobileFiltersOpen(false);
-                      }}
-                    >
-                      {type}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="px-4 mt-6">
-              <h3 className="text-sm font-medium text-gray-500">Sort By</h3>
-              <div className="mt-2 space-y-2">
-                {[
-                  { value: "name-asc", label: "Name (A-Z)" },
-                  { value: "name-desc", label: "Name (Z-A)" },
-                  { value: "rating-high", label: "Highest Rating" },
-                  { value: "rating-low", label: "Lowest Rating" },
-                ].map((option) => (
-                  <div key={option.value} className="flex items-center">
-                    <button
-                      className={`px-3 py-2 text-sm font-medium rounded-md w-full text-left 
-                      ${
-                        sortOption === option.value
-                          ? "bg-blue-100 text-blue-800"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                      onClick={() => {
-                        setSortOption(option.value);
-                        setMobileFiltersOpen(false);
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="px-4 mt-6">
-              <h3 className="text-sm font-medium text-gray-500">View</h3>
-              <div className="mt-2 flex gap-2">
-                <button
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md flex items-center justify-center gap-2
-                  ${
-                    viewMode === "grid"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-gray-100 text-gray-700"
-                  }`}
-                  onClick={() => {
-                    setViewMode("grid");
-                    setMobileFiltersOpen(false);
-                  }}
-                >
-                  <Grid className="h-4 w-4" /> Grid
-                </button>
-                <button
-                  className={`flex-1 px-3 py-2 text-sm font-medium rounded-md flex items-center justify-center gap-2
-                  ${
-                    viewMode === "list"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-gray-100 text-gray-700"
-                  }`}
-                  onClick={() => {
-                    setViewMode("list");
-                    setMobileFiltersOpen(false);
-                  }}
-                >
-                  <List className="h-4 w-4" /> List
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Character Detail Modal */}
-      {showModal && selectedCharacter && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl overflow-hidden animate-fade-in">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-xl font-semibold text-gray-900">
-                {selectedCharacter.name}
-              </h3>
-              <button
-                className="text-gray-400 hover:text-gray-500"
-                onClick={() => setShowModal(false)}
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="w-full md:w-1/3">
-                  <img
-                    src={selectedCharacter.image}
-                    alt={selectedCharacter.name}
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                  <div className="mt-4 flex justify-between items-center">
-                    <div className="flex items-center">
-                      <span className="text-yellow-500 font-medium">
-                        {selectedCharacter.rating}
-                      </span>
-                      <div className="ml-2 flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(selectedCharacter.rating)
-                                ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-300"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <button
-                      className="text-blue-600 hover:text-blue-800"
-                      onClick={() => toggleFavorite(selectedCharacter.id)}
-                    >
-                      {favorites.includes(selectedCharacter.id) ? (
-                        <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-                      ) : (
-                        <StarOff className="h-6 w-6" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="mb-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                      {selectedCharacter.type}
-                    </span>
-                  </div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">
-                    About
-                  </h4>
-                  <p className="text-gray-600 mb-6">
-                    {selectedCharacter.description}
-                  </p>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">
-                    Capabilities
-                  </h4>
-                  <ul className="list-disc pl-5 text-gray-600 space-y-1">
-                    <li>Advanced natural language processing</li>
-                    <li>
-                      Domain-specific knowledge in{" "}
-                      {selectedCharacter.type.toLowerCase()} field
-                    </li>
-                    <li>Personalized responses based on user needs</li>
-                    <li>Continuous learning from interactions</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  onClick={() => setShowModal(false)}
-                >
-                  Close
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  onClick={() => {
-                    alert(`${selectedCharacter.name} selected!`);
-                    setShowModal(false);
-                  }}
-                >
-                  Select Character
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="container mx-auto px-4 py-6">
-        {/* Header Section */}
+    <div
+      className={`flex h-screen ${
+        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
+      }`}
+    >
+      {/* Sidebar */}
+      <div
+        className={`w-64 p-4 flex flex-col ${
+          darkMode ? "bg-gray-800" : "bg-white"
+        } border-r`}
+      >
         <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                AI Characters Dashboard
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Browse and manage your AI characters by personality type
-              </p>
-            </div>
-            {/* Mobile Filter Button */}
-            <button
-              className="mt-4 sm:mt-0 md:hidden px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm flex items-center gap-2 text-gray-700"
-              onClick={() => setMobileFiltersOpen(true)}
+          <h2 className="text-xl font-bold mb-6">Learning Portal</h2>
+
+          <div className="flex flex-col items-center mb-6">
+            <div
+              className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 ${
+                darkMode ? "bg-blue-600" : "bg-blue-500"
+              } text-white`}
             >
-              <Menu className="h-5 w-5" /> Filters & Sort
-            </button>
+              {userData.username.charAt(0)}
+            </div>
+            <h3 className="font-medium">{userData.username}</h3>
+            <p
+              className={`text-sm ${
+                darkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              {userData.email}
+            </p>
           </div>
         </div>
 
-        {/* Controls Row - Desktop */}
-        <div className="hidden md:flex flex-wrap gap-4 mb-6">
-          {/* Search Bar */}
-          <div className="flex-grow min-w-64">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Search characters..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Filter Dropdown */}
-          <div className="w-48">
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Character Type
-              </label>
-              <select
-                className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-              >
-                {characterTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 top-6 flex items-center pr-2 pointer-events-none">
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Sort Dropdown */}
-          <div className="w-48">
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Sort By
-              </label>
-              <select
-                className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-              >
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-                <option value="rating-high">Highest Rating</option>
-                <option value="rating-low">Lowest Rating</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 top-6 flex items-center pr-2 pointer-events-none">
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* View Toggle */}
-          <div className="flex items-end">
-            <div className="flex h-10">
+        <nav className="flex-1">
+          <ul className="space-y-2">
+            <li>
               <button
-                className={`px-4 py-2 rounded-l-lg border border-gray-300 ${
-                  viewMode === "grid"
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-gray-700"
+                onClick={() => setActivePage("courses")}
+                className={`flex items-center w-full p-2 rounded-lg ${
+                  activePage === "courses"
+                    ? darkMode
+                      ? "bg-gray-700"
+                      : "bg-gray-200"
+                    : "hover:bg-gray-200 hover:bg-opacity-20"
                 }`}
-                onClick={() => setViewMode("grid")}
               >
-                <Grid className="h-5 w-5" />
+                <Book size={20} className="mr-3" />
+                <span>My Courses</span>
               </button>
+            </li>
+            <li>
               <button
-                className={`px-4 py-2 rounded-r-lg border border-gray-300 border-l-0 ${
-                  viewMode === "list"
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-gray-700"
+                onClick={() => setActivePage("ai-characters")}
+                className={`flex items-center w-full p-2 rounded-lg ${
+                  activePage === "ai-characters"
+                    ? darkMode
+                      ? "bg-gray-700"
+                      : "bg-gray-200"
+                    : "hover:bg-gray-200 hover:bg-opacity-20"
                 }`}
-                onClick={() => setViewMode("list")}
               >
-                <List className="h-5 w-5" />
+                <MessageSquare size={20} className="mr-3" />
+                <span>AI Characters</span>
               </button>
-            </div>
-          </div>
-        </div>
+            </li>
+            <li>
+              <button
+                onClick={() => setActivePage("profile")}
+                className={`flex items-center w-full p-2 rounded-lg ${
+                  activePage === "profile"
+                    ? darkMode
+                      ? "bg-gray-700"
+                      : "bg-gray-200"
+                    : "hover:bg-gray-200 hover:bg-opacity-20"
+                }`}
+              >
+                <User size={20} className="mr-3" />
+                <span>Profile</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
 
-        {/* Mobile Search Bar */}
-        <div className="mb-4 md:hidden">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Search characters..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Active Filters */}
-        {(selectedType !== "All" || searchTerm) && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {selectedType !== "All" && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {selectedType}
-                <button
-                  className="ml-1 text-blue-600 hover:text-blue-800"
-                  onClick={() => setSelectedType("All")}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </span>
+        <div className="mt-auto pt-4 border-t border-gray-200 border-opacity-30">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`flex items-center w-full p-2 mb-2 rounded-lg ${
+              darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
+            }`}
+          >
+            {darkMode ? (
+              <Sun size={20} className="mr-3" />
+            ) : (
+              <Moon size={20} className="mr-3" />
             )}
-            {searchTerm && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                Search: {searchTerm}
-                <button
-                  className="ml-1 text-blue-600 hover:text-blue-800"
-                  onClick={() => setSearchTerm("")}
+            <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+          </button>
+          <button
+            onClick={handleSignOut}
+            className={`flex items-center w-full p-2 rounded-lg ${
+              darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
+            }`}
+          >
+            <LogOut size={20} className="mr-3" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        {activePage === "courses" && (
+          <div className="p-6">
+            <h1 className="text-2xl font-bold mb-6">My Courses</h1>
+
+            {loading ? (
+              <div className="flex flex-col items-center justify-center p-12">
+                <div
+                  className={`w-16 h-16 border-4 border-t-blue-500 rounded-full animate-spin mb-4 ${
+                    darkMode ? "border-gray-700" : "border-gray-200"
+                  }`}
+                ></div>
+                <p className="text-lg">Loading...</p>
+              </div>
+            ) : courses && courses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className={`p-6 rounded-lg ${
+                      darkMode ? "bg-gray-800" : "bg-white"
+                    } shadow-md`}
+                  >
+                    <h3 className="text-lg font-bold mb-2">{course.title}</h3>
+                    <div className="mb-4">
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                className={`p-8 rounded-lg text-center ${
+                  darkMode ? "bg-gray-800" : "bg-white"
+                } shadow-md`}
+              >
+                <h3 className="text-lg mb-2">No courses found</h3>
+                <p
+                  className={`mb-4 ${
+                    darkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
                 >
-                  <X className="h-4 w-4" />
+                  Your enrolled courses will appear here.
+                </p>
+                <button
+                  onClick={handleLoadCourses}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg max-w-xs mx-auto"
+                >
+                  Browse Course Catalog
                 </button>
-              </span>
+              </div>
             )}
           </div>
         )}
 
-        {/* Content Section */}
-        <div className="space-y-8">
-          {Object.keys(groupedCharacters).length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow">
-              <Users className="h-16 w-16 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900">
-                No characters found
-              </h3>
-              <p className="text-gray-500">
-                Try adjusting your search or filter criteria
-              </p>
-            </div>
-          ) : (
-            Object.entries(groupedCharacters).map(([type, characters]) => (
-              <div
-                key={type}
-                className="bg-white rounded-lg shadow overflow-hidden"
-              >
-                <div className="px-6 py-4 bg-gray-100 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                    {type}
-                    <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      {characters.length}
-                    </span>
-                  </h2>
-                </div>
+        {activePage === "ai-characters" && (
+          <div className="p-6 h-full flex flex-col">
+            <h1 className="text-2xl font-bold mb-6">AI Characters</h1>
 
-                {viewMode === "grid" ? (
-                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                    {characters.map((character) => (
-                      <div
-                        key={character.id}
-                        className="group bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300"
-                      >
-                        <div className="relative">
-                          <img
-                            src={character.image}
-                            alt={character.name}
-                            className="w-full h-48 object-cover"
+            {selectedCharacter ? (
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div
+                      className={`w-16 h-16 flex items-center justify-center text-2xl rounded-full mr-4 ${
+                        darkMode ? "bg-indigo-600" : "bg-indigo-500"
+                      } text-white`}
+                    >
+                      {currentCharacter.avatar}
+                    </div>
+                    <div>
+                      <div className="flex items-center">
+                        <h2 className="text-xl font-bold">
+                          {currentCharacter.name}
+                        </h2>
+                        <div className="flex items-center ml-2">
+                          <Star
+                            size={16}
+                            className="text-yellow-400 fill-yellow-400"
                           />
-                          <button
-                            className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(character.id);
-                            }}
-                          >
-                            {favorites.includes(character.id) ? (
-                              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                            ) : (
-                              <Star className="h-5 w-5 text-gray-400 hover:text-yellow-400" />
-                            )}
-                          </button>
-                        </div>
-                        <div className="p-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-medium text-gray-900">
-                              {character.name}
-                            </h3>
-                            <div className="flex items-center">
-                              <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                              <span className="ml-1 text-sm text-gray-600">
-                                {character.rating}
-                              </span>
-                            </div>
-                          </div>
-                          <span className="inline-block mt-1 mb-2 px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                            {character.type}
+                          <span className="ml-1">
+                            {currentCharacter.rating}
                           </span>
-                          <p className="text-gray-600 text-sm mb-3">
-                            {character.description}
-                          </p>
-                          <button
-                            onClick={() => handleSelectCharacter(character)}
-                            className="mt-2 w-full px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-sm font-medium transition-colors duration-300"
-                          >
-                            View Details
-                          </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-gray-200">
-                    {characters.map((character) => (
-                      <li
-                        key={character.id}
-                        className="px-4 md:px-6 py-4 flex items-center hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleSelectCharacter(character)}
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
                       >
-                        <div className="relative mr-4">
-                          <img
-                            src={character.image}
-                            alt={character.name}
-                            className="h-16 w-16 rounded-full object-cover"
+                        {currentCharacter.type}
+                      </p>
+                      <p
+                        className={`text-xs ${
+                          darkMode ? "text-indigo-400" : "text-indigo-600"
+                        }`}
+                      >
+                        {currentCharacter.description}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+  onClick={() => setSelectedCharacter(null)}
+  className={`h-8 px-2 text-xs font-medium rounded ${
+    darkMode
+      ? "bg-gray-700 hover:bg-gray-600 text-white"
+      : "bg-green-600 hover:bg-green-700 text-white"
+  }`}
+  style={{ minWidth:'auto', maxWidth: 'fit-content', width: 'auto' }}
+> Change
+</button>
+
+                </div>
+
+                <div
+                  className={`flex-1 ${
+                    darkMode ? "bg-gray-800" : "bg-white"
+                  } rounded-lg p-4 mb-4 overflow-auto`}
+                >
+                  <div className="flex items-start mb-4">
+                    <div
+                      className={`w-10 h-10 rounded-full mr-3 flex items-center justify-center ${
+                        darkMode ? "bg-indigo-600" : "bg-indigo-500"
+                      } text-white text-lg`}
+                    >
+                      {currentCharacter.avatar}
+                    </div>
+                    <div
+                      className={`p-3 rounded-lg max-w-3xl ${
+                        darkMode ? "bg-gray-700" : "bg-gray-100"
+                      }`}
+                    >
+                      <p>{getCharacterMessages(currentCharacter.id)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start mb-4 flex-row-reverse">
+                    <div
+                      className={`w-10 h-10 rounded-full ml-3 flex items-center justify-center ${
+                        darkMode ? "bg-blue-600" : "bg-blue-500"
+                      } text-white`}
+                    >
+                      {userData.username.charAt(0)}
+                    </div>
+                    <div
+                      className={`p-3 rounded-lg max-w-3xl ${
+                        darkMode ? "bg-gray-700" : "bg-gray-200"
+                      }`}
+                    >
+                      <p>
+                        Hi {currentCharacter.name}! Can you help me with
+                        something?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    placeholder={`Message ${currentCharacter.name}...`}
+                    className={`flex-grow p-3 rounded-l-lg ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-300"
+                    } border focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                  />
+                  <button className="bg-green-600 text-white px-3 py-1 rounded-r-lg hover:bg-green-700 text-sm shrink-0 w-auto">
+                    Send
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="relative mb-6">
+                  <input
+                    type="text"
+                    placeholder="Search characters by name, type, or description..."
+                    className={`w-full p-3 pl-10 rounded-lg ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    } border focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <Search
+                    size={18}
+                    className="absolute left-3 top-3.5 text-gray-400"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {filteredCharacters.map((character) => (
+                    <div
+                      key={character.id}
+                      className={`${
+                        darkMode ? "bg-gray-800" : "bg-white"
+                      } rounded-lg shadow-md overflow-hidden cursor-pointer transition-transform hover:scale-105`}
+                      onClick={() => setSelectedCharacter(character.id)}
+                    >
+                      <div className="relative aspect-square">
+                        <img
+                          src={character.image}
+                          alt={character.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div
+                          className={`absolute top-2 right-2 flex items-center py-1 px-2 rounded-full ${
+                            darkMode ? "bg-gray-800" : "bg-white"
+                          } shadow-md`}
+                        >
+                          <Star
+                            size={14}
+                            className="text-yellow-400 fill-yellow-400"
                           />
-                          <button
-                            className="absolute -top-1 -right-1 p-1 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(character.id);
-                            }}
-                          >
-                            {favorites.includes(character.id) ? (
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ) : (
-                              <Star className="h-4 w-4 text-gray-400 hover:text-yellow-400" />
-                            )}
-                          </button>
+                          <span className="ml-1 text-sm">
+                            {character.rating}
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-base md:text-lg font-medium text-gray-900 truncate">
+                        <div className="absolute bottom-0 left-0 right-0 flex items-center p-2 bg-gradient-to-t from-black to-transparent">
+                          <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mr-2 ${
+                              darkMode ? "bg-indigo-600" : "bg-indigo-500"
+                            } text-white`}
+                          >
+                            {character.avatar}
+                          </div>
+                          <div className="text-white">
+                            <h3 className="font-bold text-sm">
                               {character.name}
                             </h3>
-                            <div className="flex items-center ml-2">
-                              <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                              <span className="ml-1 text-sm text-gray-600">
-                                {character.rating}
-                              </span>
-                            </div>
+                            <p className="text-xs opacity-80">
+                              {character.type}
+                            </p>
                           </div>
-                          <span className="inline-block mt-1 mb-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                            {character.type}
-                          </span>
-                          <p className="text-sm text-gray-500 truncate">
-                            {character.description}
-                          </p>
                         </div>
-                        <button
-                          className="ml-4 hidden sm:block bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-md text-sm font-medium"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectCharacter(character);
-                          }}
+                      </div>
+                      <div className="p-3">
+                        <p
+                          className={`text-xs ${
+                            darkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                         >
-                          View Details
+                          {character.description}
+                        </p>
+                        <button
+                          className={`w-2/3 mx-auto block mt-2 py-1.5 rounded-lg ${
+                            darkMode
+                              ? "bg-indigo-600 hover:bg-indigo-700"
+                              : "bg-indigo-500 hover:bg-indigo-600"
+                          } text-white text-sm`}
+                        >
+                          Chat Now
                         </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))
-          )}
->>>>>>> 92bc8b0737aed62b06cc6caad2b8d107c66b30d4
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
-      <div>
-        <h1>AI Character</h1>
-        <h2>Name: {aiName}</h2>
-        <h2>Description: {aiDescription}</h2>
-        <h2>Image: {aiImage}</h2>
-        <h2>Personality: {aiPersonality}</h2>
+        {activePage === "profile" && (
+          <div className="p-6">
+            <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
+            <div
+              className={`p-6 rounded-lg ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              } shadow-md`}
+            >
+              <div className="flex items-center mb-6">
+                <div
+                  className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mr-4 ${
+                    darkMode ? "bg-blue-600" : "bg-blue-500"
+                  } text-white`}
+                >
+                  {userData.username.charAt(0)}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">{userData.username}</h2>
+                  <p
+                    className={`${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    {userData.email}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium mb-2">Account Information</h3>
+                  <div
+                    className={`p-4 rounded-lg ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Username
+                        </p>
+                        <p>{userData.username}</p>
+                      </div>
+                      <div>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Email
+                        </p>
+                        <p>{userData.email}</p>
+                      </div>
+                      <div>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Member Since
+                        </p>
+                        <p>January 15, 2025</p>
+                      </div>
+                      <div>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Subscription
+                        </p>
+                        <p>Premium Plan</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-2">Learning Statistics</h3>
+                  <div
+                    className={`p-4 rounded-lg ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-2xl font-bold">
+                          {courses ? courses.length : 0}
+                        </p>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Courses Enrolled
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">20</p>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Hours Spent
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">12</p>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          Certificates Earned
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default Dashboard;
-

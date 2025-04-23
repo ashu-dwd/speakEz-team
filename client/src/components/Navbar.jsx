@@ -5,12 +5,7 @@ import "./Navbar.css";
 import { auth } from "../Firebase";
 import { useAuth } from "../context/authContext";
 
-<<<<<<< HEAD
-const Navbar = ({isAdmin}) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(null);
-=======
 const Navbar = ({ isAdmin }) => {
->>>>>>> 92bc8b0737aed62b06cc6caad2b8d107c66b30d4
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
