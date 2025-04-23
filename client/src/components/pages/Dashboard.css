@@ -1,64 +1,59 @@
+/* Dashboard.css */
+
 .dashboard-container {
-  display: flex;
-  justify-content: center;
-  padding: 40px;
-  background-color: #f5f7fa;
-  min-height: 100vh;
-}
-
-.dashboard-card {
-  background: white;
-  padding: 30px 40px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  width: 100%;
   max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
 }
 
-.dashboard-card h1 {
+.dashboard-title {
   font-size: 28px;
+  font-weight: bold;
   margin-bottom: 10px;
-  color: #333;
 }
 
-.user-email {
-  font-size: 14px;
-  color: #777;
+.dashboard-email {
+  color: #555;
   margin-bottom: 20px;
 }
 
 .dashboard-section {
-  margin-top: 30px;
+  margin-bottom: 25px;
 }
 
-.dashboard-section h2 {
+.dashboard-subtitle {
   font-size: 20px;
   margin-bottom: 10px;
-  color: #444;
 }
 
-.course-list {
-  list-style: none;
-  padding-left: 0;
+.dashboard-list {
+  padding-left: 20px;
 }
 
-.course-list li {
-  background-color: #f0f2f5;
-  margin-bottom: 8px;
-  padding: 10px 15px;
-  border-radius: 8px;
+.dashboard-list-item {
+  margin-bottom: 5px;
 }
 
-.progress-bar {
-  width: 100%;
-  height: 20px;
-  background-color: #eee;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 8px;
+.dashboard-progress-circle {
+  width: 100px;
+  height: 100px;
+  border: 6px solid #007bff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #007bff;
+  margin-top: 10px;
 }
 
-.progress-fill {
-  height: 100%;
-  background-color: #4caf50;
+.dashboard-loading {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 18px;
 }
