@@ -1,36 +1,41 @@
 import { nanoid } from "nanoid";
 import aiChar from "../models/aiChar.js";
 
-
 const generateCharacter = async (req, res) => {
-    const { name, description, personality } = req.body;
-    const image = req.file.path;
-    if (!name || !description || !personality || !image) {
-        return res.status(400).json({ error: "Please fill all the fields" });
-    }
-    // Here you would typically save the character to a database or perform some other action.
-    const charId = nanoid(8);
     try {
-        const aiChar = await aiChar.create({
+        const { name, description, personality } = req.body;
+        const image = req.file?.filename || "image.jpg";
+
+        // Validation
+        if (!name || !description || !personality || !image) {
+            return res.status(400).json({ error: "Please fill all the fields" });
+        }
+
+        const charId = nanoid(8);
+
+        const newCharacter = await aiChar.create({
             charId,
             name,
             description,
             personality,
             image,
+            createdBy: req.user._id
         });
-        return res.status(200).json({
+
+        return res.status(201).json({
             message: "Character generated successfully",
             character: {
+                charId,
                 name,
                 description,
                 personality,
+                image,
             },
         });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        console.error("Character creation error:", error);
+        return res.status(500).json({ error: "Server error. Please try again later." });
     }
+};
 
-}
-
-
-export { generateCharacter }
+export { generateCharacter };
