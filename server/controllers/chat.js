@@ -8,10 +8,12 @@ import Chat from "../models/chat.js";
 const generateChatRoomId = async (req, res) => {
     const { charId } = req.body;
     console.log(charId);
+    if (!charId) return res.status(400).json({ error: "Character ID is required" });
     const roomId = nanoid(10);
     await Room.create({
         roomId: roomId,
-        userId: '6807346ff80c058e582ebe55',
+        charId: charId,
+        userId: req.user.userId,
     });
     return res.status(200).json({ roomId: roomId, success: true });
 }

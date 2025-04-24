@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "/favicon.jpg";
 import "./Navbar.css";
 import { auth } from "../Firebase";
-import { useAuth } from "../context/authContext";
+import { AuthContext } from "../context/authContext";
 
-const Navbar = ({ isAdmin }) => {
+const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
+  const { user, setUser } = useContext(AuthContext);
+  const dropdownRef = useRef(null);
 
   const isLoggedIn = !!user;
 
@@ -22,6 +23,18 @@ const Navbar = ({ isAdmin }) => {
       console.error("Logout Error:", err);
     }
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="navbar">
@@ -43,14 +56,6 @@ const Navbar = ({ isAdmin }) => {
             </Link>
           </li>
         ))}
-
-        {isAdmin && (
-          <li>
-            <Link to="/aicharacter" className="nav-link">
-              Create AI Character
-            </Link>
-          </li>
-        )}
       </ul>
 
       {!isLoggedIn ? (
@@ -63,17 +68,24 @@ const Navbar = ({ isAdmin }) => {
           </Link>
         </div>
       ) : (
-        <div className="dropdown">
+        <div className="dropdown" ref={dropdownRef}>
           <button
             onClick={() => setShowDropdown((prev) => !prev)}
             className="dropdown-toggle"
           >
-            Account ▾
+            {user.displayName || "Account"} ▾
           </button>
           {showDropdown && (
             <div className="dropdown-menu">
-              <Link to="/dashboard">Dashboard</Link>
-              <button onClick={handleLogout}>Logout</button>
+              <p className="dropdown-item">
+                Signed in as <strong>{user.displayName || user.email}</strong>
+              </p>
+              <Link to="/dashboard" className="dropdown-item">
+                Dashboard
+              </Link>
+              <button onClick={handleLogout} className="dropdown-item">
+                Logout
+              </button>
             </div>
           )}
         </div>

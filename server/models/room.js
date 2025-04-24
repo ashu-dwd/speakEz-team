@@ -12,7 +12,6 @@ const roomSchema = new mongoose.Schema({
     },
     charId: {
         type: String,
-        default: 'q6zgrKfJ',
         ref: 'Character',
         required: true
     },

@@ -1,8 +1,7 @@
-
 .navbar {
   background-color: white;
-  color:black;
-  border-radius: 999px; 
+  color: black;
+  border-radius: 999px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 15px;
   margin: 1rem auto;
@@ -18,7 +17,7 @@
 
 /* Logo Style */
 .navbar-brand img {
-  height: 84px; 
+  height: 84px;
   width: auto;
   object-fit: contain;
 }
@@ -92,14 +91,11 @@
   background-color: #000;
   color: #fff;
   font-weight: 600;
-  padding: 20px;
+  padding: 10px 20px;
   border: none;
   border-radius: 999px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-right: 60px;
-  width:150px;
-  font-size: 17px;
 }
 
 .dropdown-toggle:hover {
@@ -116,11 +112,10 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   padding: 0.5rem 0;
   z-index: 999;
-  min-width: 180px;
+  min-width: 200px;
 }
 
-.dropdown-menu a,
-.dropdown-menu button {
+.dropdown-item {
   display: block;
   width: 100%;
   padding: 12px 20px;
@@ -128,18 +123,13 @@
   border: none;
   text-align: left;
   font-size: 16px;
-  font-weight: 500;
   color: #333;
-  text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
-.dropdown-menu a:hover,
-.dropdown-menu button:hover {
+.dropdown-item:hover {
   background-color: #f7f7f7;
 }
-
 
 /* Responsive - Stack on smaller screens */
 @media (max-width: 768px) {
