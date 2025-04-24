@@ -7,7 +7,6 @@ import aiCharRoute from './Routes/aiCharRoute.js';
 import connectDB from "./connect.js";
 import verifyToken from "./Middlewares/auth.js";
 
-
 const app = express();
 
 const PORT = process.env.PORT || 3000;

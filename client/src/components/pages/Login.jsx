@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Login.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Auto-fill remembered email and redirect if already logged in
@@ -36,9 +38,10 @@ const Login = () => {
         }
       );
 
-      const { data, message, success } = response.data;
+      const { data, message, success, user } = response.data;
 
       if (success && data) {
+        setUser(user);
         localStorage.setItem("token", data);
         localStorage.setItem("authState", "true");
 
