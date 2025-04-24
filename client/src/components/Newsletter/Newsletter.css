@@ -1,12 +1,11 @@
 .newsletter {
-  background: linear-gradient(to bottom, #4d46c5, #1e127c);
+  background: #89CFF0;
   padding: 80px 20px;
   text-align: center;
   color: white;
   position: relative;
   overflow: hidden;
 }
-
 .newsletter-content {
   display: flex;
   flex-direction: column;
@@ -28,24 +27,21 @@
   background-image: radial-gradient(circle at center, #2bd2ff, #00a7d5);
   overflow: hidden;
 }
-
 .pro-badge {
-  background-color: #ff924f;
+  background-color: #003366;
   color: white;
   font-weight: 600;
   padding: 8px 20px;
   border-radius: 14px;
-  font-size: 16px;
+  font-size: 20px;
   margin-top: 50px;
   z-index: 2;
 }
-
 .newsletter h2 {
-  font-size: 32px;
-  font-weight: 700;
-  margin: 0;
+ font-size: 32px;
+ font-weight: 700;
+ margin: 0;
 }
-
 .learn-more-btn {
   background: linear-gradient(to right, #24c6ff, #3a8ef6);
   color: white;
@@ -56,6 +52,7 @@
   border: none;
   cursor: pointer;
   transition: 0.3s;
+  width: 300px;
 }
 
 .learn-more-btn:hover {

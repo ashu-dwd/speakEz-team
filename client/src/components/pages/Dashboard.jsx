@@ -18,8 +18,19 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({});
   const navigate = useNavigate();
+<<<<<<< HEAD
+  
+=======
 
+>>>>>>> 7804dd2faccd517d4a8ec8899fe6d789c50602ea
   const handleSignOut = () => {
+    // Clear any auth tokens or user data from localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    // You may want to clear other relevant data like:
+    // localStorage.removeItem("enrolledCourses");
+    
+    // Then navigate to login page
     navigate("/login");
   };
 
@@ -168,7 +179,13 @@ function Dashboard() {
         <div className="mt-auto pt-4 border-t border-gray-200">
           <button
             onClick={handleSignOut}
+<<<<<<< HEAD
+            className={`flex items-center w-full p-2 rounded-lg ${
+              darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
+            } text-red-500 hover:text-red-600`}
+=======
             className="flex items-center w-full p-2 rounded-lg hover:bg-gray-200"
+>>>>>>> 7804dd2faccd517d4a8ec8899fe6d789c50602ea
           >
             <LogOut size={20} className="mr-3" />
             <span>Sign Out</span>
@@ -220,11 +237,123 @@ function Dashboard() {
           <div className="p-6 h-full">
             <h1 className="text-2xl font-bold mb-6">AI Characters</h1>
 
+<<<<<<< HEAD
+            {selectedCharacter ? (
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div
+                      className={`w-16 h-16 flex items-center justify-center text-2xl rounded-full mr-4 ${
+                        darkMode ? "bg-indigo-600" : "bg-indigo-500"
+                      } text-white`}
+                    >
+                      {currentCharacter.avatar}
+                    </div>
+                    <div>
+                      <div className="flex items-center">
+                        <h2 className="text-xl font-bold">
+                          {currentCharacter.name}
+                        </h2>
+                        <div className="flex items-center ml-2">
+                          <Star
+                            size={16}
+                            className="text-yellow-400 fill-yellow-400"
+                          />
+                          <span className="ml-1">
+                            {currentCharacter.rating}
+                          </span>
+                        </div>
+                      </div>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {currentCharacter.type}
+                      </p>
+                      <p
+                        className={`text-xs ${
+                          darkMode ? "text-indigo-400" : "text-indigo-600"
+                        }`}
+                      >
+                        {currentCharacter.description}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedCharacter(null)}
+                    className={`h-8 px-2 text-xs font-medium rounded ${
+                      darkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-white"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                    }`}
+                    style={{ minWidth:'auto', maxWidth: 'fit-content', width: 'auto' }}
+                  > Change
+                  </button>
+                </div>
+
+                <div
+                  className={`flex-1 ${
+                    darkMode ? "bg-gray-800" : "bg-white"
+                  } rounded-lg p-4 mb-4 overflow-auto`}
+                >
+                  <div className="flex items-start mb-4">
+                    <div
+                      className={`w-10 h-10 rounded-full mr-3 flex items-center justify-center ${
+                        darkMode ? "bg-indigo-600" : "bg-indigo-500"
+                      } text-white text-lg`}
+                    >
+                      {currentCharacter.avatar}
+                    </div>
+                    <div
+                      className={`p-3 rounded-lg max-w-3xl ${
+                        darkMode ? "bg-gray-700" : "bg-gray-100"
+                      }`}
+                    >
+                      <p>{getCharacterMessages(currentCharacter.id)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start mb-4 flex-row-reverse">
+                    <div
+                      className={`w-10 h-10 rounded-full ml-3 flex items-center justify-center ${
+                        darkMode ? "bg-blue-600" : "bg-blue-500"
+                      } text-white`}
+                    >
+                      {userData.username.charAt(0)}
+                    </div>
+                    <div
+                      className={`p-3 rounded-lg max-w-3xl ${
+                        darkMode ? "bg-gray-700" : "bg-gray-200"
+                      }`}
+                    >
+                      <p>
+                        Hi {currentCharacter.name}! Can you help me with
+                        something?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    placeholder={`Message ${currentCharacter.name}...`}
+                    className={`flex-grow p-3 rounded-l-lg ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-300"
+                    } border focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                  />
+                  <button className="bg-green-600 text-white px-3 py-1 rounded-r-lg hover:bg-green-700 text-sm shrink-0 w-auto">
+                    Send
+                  </button>
+=======
             {/* Search bar */}
             <div className="mb-6">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search size={18} className="text-gray-500" />
+>>>>>>> 7804dd2faccd517d4a8ec8899fe6d789c50602ea
                 </div>
                 <input
                   type="text"

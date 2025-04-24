@@ -18,28 +18,28 @@ const Footer = () => {
         <div className="footer-col">
           <h4>Courses</h4>
           <ul>
-            <li>Basic English</li>
-            <li>Business English</li>
-            <li>IELTS Prep</li>
-            <li>Fluency Mastery</li>
+            <li><Link to="/Morecourse">Basic English</Link></li>
+            <li><Link to="/Morecourse"> Business English</Link> </li>
+            <li><Link to="/Morecourse">IELTS Prep </Link></li>
+            <li><Link to="/Morecourse">Fluency Mastery </Link></li>
           </ul>
         </div>
         <div className="footer-col">
           <h4>Tools</h4>
           <ul>
-            <li>Speech Practice</li>
-            <li>Grammar Checker</li>
-            <li>Vocabulary Builder</li>
-            <li>Pronunciation AI</li>
+            <li><Link to="/practicewithai"> Speech Practice </Link></li>
+            <li><Link to="/grammar"> Grammar Notes </Link> </li>
+            <li><Link to="/vocabulary"> Vocabulary  </Link> </li>
+            <li><Link to="/pronounciation"> Pronunciation Tips </Link></li>
           </ul>
         </div>
         <div className="footer-col">
           <h4>Support</h4>
           <ul>
-            <li>Help Center</li>
-            <li>FAQs</li>
-            <li>Terms of Use</li>
-            <li>Privacy Policy</li>
+            <li><Link to="/help"> Help Center </Link> </li>
+            <li><Link to="/faq">FAQs</Link></li>
+            <li> <Link to="/termsofuse">Terms of Use</Link></li>
+            <li> <Link to="/privacypolicy">Privacy Policy</Link></li>
           </ul>
         </div>
       </div>
