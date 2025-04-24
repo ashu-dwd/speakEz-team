@@ -28,6 +28,12 @@ import Verifyotp from "./components/pages/Verifyotp";
 import Payment from "./components/Payment/Payment";
 import ResetPassword from "./components/Resetpassword/Resetpassword";
 import VoiceInterface from "./components/pages/voiceInterface";
+import Grammar from "./components/Grammar/Grammar";
+import Pronunciation from "./components/Pronounciation/Pronounciation";
+import Faq from "./components/Faq/Faq";
+import TermsOfUse from "./components/Termsofuse/Termsofuse";
+import PrivacyPolicy from "./components/Privacypolicy/Privacypolicy";
+
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -67,6 +73,11 @@ const App = () => {
         <Route path="/payment" element={<Payment />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/voice-interface" element={<VoiceInterface />} />
+        <Route path="/grammar" element={<Grammar />}/>
+        <Route path="/pronounciation" element={<Pronunciation/>} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/termsofuse" element={<TermsOfUse />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
       </Routes>
       <Footer />
     </>

@@ -1,5 +1,5 @@
 .course-container {
-  background-color: #1b0058; /* deep purple */
+  background-color:#B5E5CF; 
   padding: 4rem 2rem;
   text-align: center;
   color: #fff;
@@ -7,7 +7,7 @@
 }
 
 .course-container h2{
-  color: white;
+  color: black;
   padding: 5px;
   margin-bottom: 50px;
   font-family: 'Montserrat', sans-serif;
@@ -26,7 +26,7 @@
 .course-card {
   background-color: white;
   color: #000;
-  border: 2px solid #25d366; /* WhatsApp green */
+  border: 2px solid ; 
   border-radius: 2rem;
   padding: 1.5rem;
   text-align: left;
@@ -89,8 +89,8 @@
 }
 
 .course-button {
-  background-color: #25d366;
-  color: #1b0058;
+  background-color:black;
+  color: white;
   padding: 0.75rem 1.5rem;
   border: none;
   font-size: 1rem;

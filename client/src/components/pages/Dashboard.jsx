@@ -21,9 +21,18 @@ function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
   const handleSignOut = () => {
+    // Clear any auth tokens or user data from localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    // You may want to clear other relevant data like:
+    // localStorage.removeItem("enrolledCourses");
+    
+    // Then navigate to login page
     navigate("/login");
   };
+
   const handleLoadCourses = () => {
     navigate("/Morecourse");
   };
@@ -258,7 +267,7 @@ function Dashboard() {
             onClick={handleSignOut}
             className={`flex items-center w-full p-2 rounded-lg ${
               darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
-            }`}
+            } text-red-500 hover:text-red-600`}
           >
             <LogOut size={20} className="mr-3" />
             <span>Sign Out</span>
@@ -368,16 +377,15 @@ function Dashboard() {
                     </div>
                   </div>
                   <button
-  onClick={() => setSelectedCharacter(null)}
-  className={`h-8 px-2 text-xs font-medium rounded ${
-    darkMode
-      ? "bg-gray-700 hover:bg-gray-600 text-white"
-      : "bg-green-600 hover:bg-green-700 text-white"
-  }`}
-  style={{ minWidth:'auto', maxWidth: 'fit-content', width: 'auto' }}
-> Change
-</button>
-
+                    onClick={() => setSelectedCharacter(null)}
+                    className={`h-8 px-2 text-xs font-medium rounded ${
+                      darkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-white"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                    }`}
+                    style={{ minWidth:'auto', maxWidth: 'fit-content', width: 'auto' }}
+                  > Change
+                  </button>
                 </div>
 
                 <div
