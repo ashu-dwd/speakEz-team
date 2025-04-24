@@ -16,6 +16,7 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState({});
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -28,13 +29,32 @@ function Dashboard() {
   const handleCharacterClick = (charId) => {
     navigate("/voice-interface", { state: { charId: charId } });
   };
+  ///fetch user data from the server
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/userData", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        console.log(response.data);
+        if (response.data.success) {
+          setUserData(
+            response.data.user
+              ? response.data.user
+              : { username: "", email: "" }
+          );
+        } else {
+          alert("Something went wrong, please try again later.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
 
-  // Mock user data
-  const userData = {
-    username: "AlexJohnson",
-    email: "alex.johnson@example.com",
-  };
-
+    fetchUserData();
+  }, []);
   // Effect to simulate fetching courses from external source
   useEffect(() => {
     const fetchEnrolledCourses = () => {
@@ -57,7 +77,11 @@ function Dashboard() {
   useEffect(() => {
     const fetchAiCharacters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/aiChar");
+        const response = await axios.get("http://localhost:5000/api/aiChar", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         console.log(response.data);
         // Extract the allCharacters array from the response
         if (response.data && response.data.allCharacters) {
@@ -94,9 +118,9 @@ function Dashboard() {
 
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 bg-blue-500 text-white">
-              {userData.username.charAt(0)}
+              {userData.username}
             </div>
-            <h3 className="font-medium">{userData.username}</h3>
+            <h3 className="font-medium">{userData.name}</h3>
             <p className="text-sm text-gray-500">{userData.email}</p>
           </div>
         </div>

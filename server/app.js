@@ -24,8 +24,8 @@ app.use(express.json());
 //middleware for routes
 app.use('/api/user', userRoute);
 app.use('/api/userData', verifyToken, userDataRoute);
-app.use('/api/chat', chatRoute);
-app.use('/api/aiChar', aiCharRoute)
+app.use('/api/chat', verifyToken, chatRoute);
+app.use('/api/aiChar', verifyToken, aiCharRoute)
 
 
 app.listen(PORT, () => {

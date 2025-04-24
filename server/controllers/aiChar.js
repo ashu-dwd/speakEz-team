@@ -12,6 +12,7 @@ const generateCharacter = async (req, res) => {
         }
 
         const charId = nanoid(8);
+        console.log(req.user)
 
         const newCharacter = await aiChar.create({
             charId,
@@ -19,7 +20,7 @@ const generateCharacter = async (req, res) => {
             description,
             personality,
             image,
-            createdBy: req.user._id
+            createdBy: req.user.userId
         });
 
         return res.status(201).json({
