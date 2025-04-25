@@ -3,14 +3,15 @@ import "./Login.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const { setUser } = useContext(AuthContext);
+  const { setUser, login } = useContext(AuthContext);
   const navigate = useNavigate();
-
+ 
   // Auto-fill remembered email and redirect if already logged in
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberEmail");
@@ -42,6 +43,7 @@ const Login = () => {
 
       if (success && data) {
         setUser(user);
+        localStorage.setItem("user", JSON.stringify(user))
         localStorage.setItem("token", data);
         localStorage.setItem("authState", "true");
 
@@ -96,9 +98,9 @@ const Login = () => {
             />
             Remember me
           </label>
-          <a href="/forgot-password" className="forgot-password">
+          <Link to="/forgot-password" className="forgot-password">
             Forgot password?
-          </a>
+          </Link>
         </div>
 
         <button type="submit" className="login-button">
