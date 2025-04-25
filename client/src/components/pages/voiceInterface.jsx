@@ -18,7 +18,7 @@ export default function VoiceInteractiveCircle() {
   const [colorScheme, setColorScheme] = useState("blue");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-
+  
   // Speech recognition states
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -33,6 +33,7 @@ export default function VoiceInteractiveCircle() {
   // References
   const recognitionRef = useRef(null);
   const synthRef = useRef(window.speechSynthesis);
+  const isRecognitionActiveRef = useRef(false); 
 
   // Get charId from URL params
   const params = useParams();
@@ -78,13 +79,13 @@ export default function VoiceInteractiveCircle() {
 
   // Initialize speech recognition
   useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
 
       recognitionRef.current.onresult = (event) => {
         const userText = event.results[0][0].transcript;
@@ -93,23 +94,39 @@ export default function VoiceInteractiveCircle() {
       };
 
       recognitionRef.current.onend = () => {
-        if (isListening) {
-          recognitionRef.current.start();
+        console.log("Recognition ended");
+        isRecognitionActiveRef.current = false;
+        setIsListening(false);
+        
+        // Only restart if not speaking and after a delay
+        if (!isSpeaking) {
+          setTimeout(() => {
+            if (!isRecognitionActiveRef.current && !isSpeaking) {
+              startListening();
+            }
+          }, 1000);
         }
       };
 
       recognitionRef.current.onerror = (event) => {
-        console.error("Speech recognition error", event.error);
+        console.error("Speech recognition error", event.error, event);
+        isRecognitionActiveRef.current = false;
         setIsListening(false);
+        
+        // Only try to restart if it's not an abort error
+        if (event.error !== "aborted" && !isSpeaking) {
+          setTimeout(() => {
+            startListening();
+          }, 2000); // Longer delay after real errors
+        }
       };
-
-      // Setup speech synthesis utterance end event
+  
+      // Speech synthesis voices ready
       synthRef.current.onvoiceschanged = () => {
         const utterance = new SpeechSynthesisUtterance("");
         utterance.onend = () => {
           setIsSpeaking(false);
-          // Start listening after speaking ends
-          if (!isListening && !isSpeaking) {
+          if (!isListening && !isSpeaking && !isRecognitionActiveRef.current) {
             startListening();
           }
         };
@@ -117,28 +134,31 @@ export default function VoiceInteractiveCircle() {
     } else {
       setStatus("Speech recognition not supported in this browser");
     }
-
+  
     // Play welcome message on component mount
     if (!welcomePlayed) {
       setTimeout(() => {
-        const welcomeMessage =
-          "Welcome to the interactive circle! You can speak to control the animations or ask questions.";
+        const welcomeMessage = "Welcome to the interactive circle! You can speak to control the animations or ask questions.";
         speak(welcomeMessage);
         setResponse(welcomeMessage);
         setWelcomePlayed(true);
       }, 1000);
     }
-
+    
+    // Cleanup on unmount
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        try {
+          recognitionRef.current.stop();
+        } catch (err) {
+          console.log("Error stopping recognition on unmount:", err);
+        }
       }
-      if (synthRef.current) {
-        synthRef.current.cancel();
-      }
+      if (synthRef.current) synthRef.current.cancel();
+      isRecognitionActiveRef.current = false;
     };
   }, []);
-
+   
   // Animation effect
   useEffect(() => {
     let intervalId;
@@ -154,16 +174,16 @@ export default function VoiceInteractiveCircle() {
 
   // Monitor speaking state to toggle listening
   useEffect(() => {
-    if (!isSpeaking && !isListening) {
+    if (!isSpeaking && !isListening && !isRecognitionActiveRef.current) {
       startListening();
     }
-  }, [isSpeaking]);
+  }, [isSpeaking, isListening]);
 
   // Function to speak text
   const speak = (text) => {
     if (synthRef.current) {
       // Stop listening while speaking
-      if (isListening) {
+      if (isListening || isRecognitionActiveRef.current) {
         stopListening();
       }
 
@@ -178,8 +198,10 @@ export default function VoiceInteractiveCircle() {
       utterance.onend = () => {
         setIsSpeaking(false);
         // Auto-start listening when speech ends
-        if (!isListening) {
-          startListening();
+        if (!isListening && !isRecognitionActiveRef.current) {
+          setTimeout(() => {
+            startListening();
+          }, 500);
         }
       };
 
@@ -187,25 +209,84 @@ export default function VoiceInteractiveCircle() {
     }
   };
 
-  // Start listening
+  // Check for microphone permissions
+  useEffect(() => {
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'microphone' })
+        .then((permissionStatus) => {
+          console.log("Microphone permission status:", permissionStatus.state);
+          
+          if (permissionStatus.state === 'denied') {
+            setStatus("Microphone access denied. Please allow microphone access in your browser settings.");
+          }
+          
+          permissionStatus.onchange = () => {
+            console.log("Microphone permission status changed:", permissionStatus.state);
+            if (permissionStatus.state === 'granted') {
+              setStatus("Microphone access granted");
+              // Try to start listening again if permissions are granted
+              if (!isRecognitionActiveRef.current && !isSpeaking) {
+                setTimeout(startListening, 500);
+              }
+            }
+          };
+        });
+    }
+  }, []);
+
   const startListening = () => {
-    if (!isListening && !isSpeaking && recognitionRef.current) {
-      setIsListening(true);
-      recognitionRef.current.start();
+    if (!recognitionRef.current) return;
+    
+    try {
+      if (!isRecognitionActiveRef.current && !isSpeaking) {
+        console.log("Starting speech recognition");
+        recognitionRef.current.start();
+        isRecognitionActiveRef.current = true;
+        setIsListening(true);
+      } else {
+        console.log("Cannot start listening: recognition already active or speaking");
+      }
+    } catch (error) {
+      console.error("Error starting speech recognition:", error);
+      isRecognitionActiveRef.current = false;
+      setIsListening(false);
+      
+      // Try again after a delay if it was an InvalidStateError
+      if (error.name === "InvalidStateError") {
+        console.log("Recognition was already running, resetting state");
+        try {
+          recognitionRef.current.stop();
+        } catch (stopError) {
+          console.log("Error stopping recognition:", stopError);
+        }
+        
+        setTimeout(() => {
+          if (!isRecognitionActiveRef.current && !isSpeaking) {
+            startListening();
+          }
+        }, 1000);
+      }
     }
   };
 
   // Stop listening
   const stopListening = () => {
-    if (isListening && recognitionRef.current) {
-      setIsListening(false);
-      recognitionRef.current.stop();
+    if (recognitionRef.current) {
+      try {
+        console.log("Stopping speech recognition");
+        recognitionRef.current.stop();
+      } catch (error) {
+        console.error("Error stopping speech recognition:", error);
+      } finally {
+        isRecognitionActiveRef.current = false;
+        setIsListening(false);
+      }
     }
   };
 
   // Toggle speech recognition (button handler)
   const toggleListening = () => {
-    if (isListening) {
+    if (isRecognitionActiveRef.current) {
       stopListening();
     } else {
       startListening();
@@ -222,7 +303,11 @@ export default function VoiceInteractiveCircle() {
 
       if (!charId || !roomId) {
         setStatus("Error: Character or room not initialized");
-        startListening();
+        setTimeout(() => {
+          if (!isRecognitionActiveRef.current && !isSpeaking) {
+            startListening();
+          }
+        }, 1000);
         return;
       }
 
@@ -250,13 +335,22 @@ export default function VoiceInteractiveCircle() {
       } else {
         setStatus("Error processing your request");
         // Auto-restart listening if there's an error
-        startListening();
+        setTimeout(() => {
+          if (!isRecognitionActiveRef.current && !isSpeaking) {
+            startListening();
+          }
+        }, 1000);
       }
     } catch (error) {
       console.error("Error processing speech input:", error);
       setStatus("Error connecting to server");
-      // Auto-restart listening if there's an error
-      startListening();
+      
+      // Auto-restart listening if there's an error after a delay
+      setTimeout(() => {
+        if (!isRecognitionActiveRef.current && !isSpeaking) {
+          startListening();
+        }
+      }, 2000);
     }
   };
 
