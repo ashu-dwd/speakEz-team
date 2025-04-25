@@ -19,6 +19,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({});
   const navigate = useNavigate();
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
 
   const handleSignOut = () => {
     // Clear any auth tokens or user data from localStorage
@@ -29,6 +30,7 @@ function Dashboard() {
     
     // Then navigate to login page
     navigate("/login");
+    window.location.reload();
   };
 
   const handleLoadCourses = () => {
@@ -137,7 +139,7 @@ function Dashboard() {
           <h2 className="text-xl font-bold mb-6">Learning Portal</h2>
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 bg-blue-500 text-white">
-              {userData.username}
+              {userData?.name?.charAt(0).toUpperCase() || "" }
             </div>
             <h3 className="font-medium">{userData.name}</h3>
             <p className="text-sm text-gray-500">{userData.email}</p>

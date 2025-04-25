@@ -5,30 +5,36 @@ import "./Navbar.css";
 import { auth } from "../Firebase";
 import { AuthContext } from "../context/authContext";
 
+
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
   const dropdownRef = useRef(null);
   console.log(user);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const isLoggedIn = !!user;
 
   const handleLogout = async () => {
     try {
       // Try Firebase signout if available
+      await auth.signOut();
+      logout();
+      navigate("/login");
       try {
         await auth.signOut();
-      } catch (e) {
-        console.log("Firebase signout not available:", e);
+      } catch (err) {
+        console.log("Logout error:", err);
       }
-      logout();
+      //logout();
     
       // Regardless of Firebase, clear all local storage tokens
-      localStorage.removeItem('token');
-      localStorage.removeItem('authState');
-      localStorage.removeItem("user");
-      
+      //localStorage.removeItem('token');
+     // localStorage.removeItem('authState');
+     // localStorage.removeItem("user");
+     //logout();
+     //setForceUpdate(prev => prev + 1);
     
       navigate("/login");
     } catch (err) {
