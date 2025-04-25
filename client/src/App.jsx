@@ -46,12 +46,10 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  const isAdmin = localStorage.getItem("role") === "admin";
-
   return (
     <>
       <ScrollToTop />
-      <Navbar isAdmin={isAdmin} />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/vocabulary" element={<Vocabulary />} />
@@ -69,7 +67,7 @@ const App = () => {
         <Route path="/developer" element={<Developer />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetails />} />
-        <Route path="/aicharacter" element={<Aicharacter isAdmin={true} />} />
+        <Route path="/aicharacter" element={<Aicharacter />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/voice-interface" element={<VoiceInterface />} />

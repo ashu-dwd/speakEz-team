@@ -17,8 +17,12 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+=======
+  const [userData, setUserData] = useState({});
+>>>>>>> edcac16fe5eb93d4e4faffb787bf6638a46fb373
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -45,13 +49,32 @@ function Dashboard() {
   const getCharacterMessages = (characterId) => {
     return "Hello! I'm here to help you learn. What would you like to know about today?";
   };
+  ///fetch user data from the server
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/userData", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        console.log(response.data);
+        if (response.data.success) {
+          setUserData(
+            response.data.user
+              ? response.data.user
+              : { username: "", email: "" }
+          );
+        } else {
+          alert("Something went wrong, please try again later.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
 
-  // Mock user data
-  const userData = {
-    username: "AlexJohnson",
-    email: "alex.johnson@example.com",
-  };
-
+    fetchUserData();
+  }, []);
   // Effect to simulate fetching courses from external source
   useEffect(() => {
     const fetchEnrolledCourses = () => {
@@ -74,7 +97,11 @@ function Dashboard() {
   useEffect(() => {
     const fetchAiCharacters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/aiChar");
+        const response = await axios.get("http://localhost:5000/api/aiChar", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         console.log(response.data);
         // Extract the allCharacters array from the response
         if (response.data && response.data.allCharacters) {
@@ -115,9 +142,9 @@ function Dashboard() {
           <h2 className="text-xl font-bold mb-6">Learning Portal</h2>
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 bg-blue-500 text-white">
-              {userData.username.charAt(0)}
+              {userData.username}
             </div>
-            <h3 className="font-medium">{userData.username}</h3>
+            <h3 className="font-medium">{userData.name}</h3>
             <p className="text-sm text-gray-500">{userData.email}</p>
           </div>
         </div>

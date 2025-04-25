@@ -10,6 +10,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
   const dropdownRef = useRef(null);
+  console.log(user);
 
   const isLoggedIn = !!user;
 
