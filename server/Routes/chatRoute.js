@@ -4,7 +4,7 @@ import { generateChatRoomId, handleUserConvo } from "../controllers/chat.js";
 const Router = express.Router();
 
 Router.post('/', generateChatRoomId);
-Router.post('/:charId/:roomId', handleUserConvo)
+Router.post('/ai', handleUserConvo)
 
 
 export default Router;

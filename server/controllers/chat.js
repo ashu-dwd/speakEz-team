@@ -18,7 +18,7 @@ const generateChatRoomId = async (req, res) => {
     return res.status(200).json({ roomId: roomId, success: true });
 }
 const handleUserConvo = async (req, res) => {
-    const { charId, roomId } = req.params;
+    const { charId, roomId } = req.body;
     const { userMsg } = req.body;
     console.log(charId, roomId);
     const isRoomExist = await Room.findOne({ roomId });
@@ -27,7 +27,7 @@ const handleUserConvo = async (req, res) => {
     if (!isCharExist) return res.status(400).json({ error: "Character not found" });
     const charResponse = await handler(userMsg, charId);
     await Chat.create({ roomId, userMsg, charMsg: charResponse });
-    return res.status(200).json({ charResponse: charResponse, success: true });
+    return res.status(200).json({ charResponse, success: true });
 }
 
 export { generateChatRoomId, handleUserConvo };

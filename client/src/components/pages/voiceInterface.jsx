@@ -1,298 +1,433 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Mic, Volume2, Settings, MessageSquare } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Play,
+  Pause,
+  RefreshCw,
+  Zap,
+  Droplet,
+  Mic,
+  MicOff,
+} from "lucide-react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-export default function VoiceInterface() {
+export default function VoiceInteractiveCircle() {
+  const [pulse, setPulse] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [animationSpeed, setAnimationSpeed] = useState(2000);
+  const [colorScheme, setColorScheme] = useState("blue");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+
+  // Speech recognition states
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [response, setResponse] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [roomId, setRoomId] = useState("");
+  const [welcomePlayed, setWelcomePlayed] = useState(false);
+
+  // API states
   const [charId, setCharId] = useState("");
-  const [error, setError] = useState(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [chatHistory, setChatHistory] = useState([]);
-  const [showChatHistory, setShowChatHistory] = useState(false);
+  const [roomId, setRoomId] = useState("");
 
+  // References
   const recognitionRef = useRef(null);
-  const synthRef = useRef(null);
-  const location = useLocation();
+  const synthRef = useRef(window.speechSynthesis);
 
-  // Initialize speech recognition and synthesis
+  // Get charId from URL params
+  const params = useParams();
+
   useEffect(() => {
-    // Set up speech synthesis
-    synthRef.current = window.speechSynthesis;
+    if (params.charId) {
+      setCharId(params.charId);
+    }
+  }, [params]);
 
-    // Set up speech recognition if available
-    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+  // Fetch room ID when charId is available
+  useEffect(() => {
+    if (!charId) return;
+
+    const fetchRoomId = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/chat`, {
+          params: { charId },
+        });
+
+        if (response.data.success) {
+          setRoomId(response.data.roomId);
+        } else {
+          console.error("Error fetching room ID:", response.data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching room ID:", error);
+      }
+    };
+
+    fetchRoomId();
+  }, [charId]);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-
-      recognitionRef.current.onstart = () => setIsListening(true);
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
 
       recognitionRef.current.onresult = (event) => {
-        const currentTranscript = Array.from(event.results)
-          .map((result) => result[0].transcript)
-          .join("");
-        setTranscript(currentTranscript);
-      };
-
-      recognitionRef.current.onerror = (event) => {
-        setError(`Speech recognition error: ${event.error}`);
-        setIsListening(false);
+        const userText = event.results[0][0].transcript;
+        setTranscript(userText);
+        handleSpeechInput(userText);
       };
 
       recognitionRef.current.onend = () => {
-        setIsListening(false);
-        if (transcript.trim() !== "") {
-          sendToBackend(transcript);
+        if (isListening) {
+          recognitionRef.current.start();
         }
       };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+      };
+
+      // Setup speech synthesis utterance end event
+      synthRef.current.onvoiceschanged = () => {
+        const utterance = new SpeechSynthesisUtterance("");
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          // Start listening after speaking ends
+          if (!isListening && !isSpeaking) {
+            startListening();
+          }
+        };
+      };
     } else {
-      setError("Speech recognition not supported in this browser");
+      setStatus("Speech recognition not supported in this browser");
+    }
+
+    // Play welcome message on component mount
+    if (!welcomePlayed) {
+      setTimeout(() => {
+        const welcomeMessage =
+          "Welcome to the interactive circle! You can speak to control the animations or ask questions.";
+        speak(welcomeMessage);
+        setResponse(welcomeMessage);
+        setWelcomePlayed(true);
+      }, 1000);
     }
 
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
-      if (synthRef.current?.speaking) {
+      if (synthRef.current) {
         synthRef.current.cancel();
       }
     };
-  }, [transcript]);
+  }, []);
 
-  // Get character ID from location state
+  // Animation effect
   useEffect(() => {
-    if (location.state?.charId) {
-      setCharId(location.state.charId);
+    let intervalId;
+
+    if (isAnimating) {
+      intervalId = setInterval(() => {
+        setPulse((prev) => !prev);
+      }, animationSpeed);
     }
-  }, [location.state]);
 
-  // Initialize chat when character ID is available
+    return () => clearInterval(intervalId);
+  }, [isAnimating, animationSpeed]);
+
+  // Monitor speaking state to toggle listening
   useEffect(() => {
-    const initializeChat = async () => {
-      if (!charId) return;
+    if (!isSpeaking && !isListening) {
+      startListening();
+    }
+  }, [isSpeaking]);
 
-      try {
-        const response = await axios.post(
-          `http://localhost:5000/api/chat`,
-          { charId },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        setRoomId(response.data.roomId);
-
-        const welcomeMsg = "Welcome! I'm listening. How can I help you today?";
-        setResponse(welcomeMsg);
-        if (!isMuted) speakResponse(welcomeMsg);
-
-        setChatHistory([{ type: "assistant", content: welcomeMsg }]);
-      } catch (err) {
-        setError("Error connecting to chat service");
+  // Function to speak text
+  const speak = (text) => {
+    if (synthRef.current) {
+      // Stop listening while speaking
+      if (isListening) {
+        stopListening();
       }
-    };
 
-    initializeChat();
-  }, [charId, isMuted]);
+      synthRef.current.cancel();
+      setIsSpeaking(true);
 
-  const sendToBackend = useCallback(
-    async (text) => {
-      if (!charId || !roomId || !text.trim()) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
 
-      setIsLoading(true);
-      setChatHistory((prev) => [...prev, { type: "user", content: text }]);
+      // Set up the onend event for each utterance
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        // Auto-start listening when speech ends
+        if (!isListening) {
+          startListening();
+        }
+      };
 
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/chat/${charId}/${roomId}`,
-          { userMsg: text },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        const assistantResponse =
-          response.data.charResponse?.mainResponse ||
-          "I didn't understand that";
-        setResponse(assistantResponse);
-        setChatHistory((prev) => [
-          ...prev,
-          { type: "assistant", content: assistantResponse },
-        ]);
-
-        if (!isMuted) speakResponse(assistantResponse);
-      } catch (err) {
-        setError(err.response?.data?.message || "Error sending message");
-      } finally {
-        setIsLoading(false);
-        setTranscript("");
-      }
-    },
-    [charId, roomId, isMuted]
-  );
-
-  const speakResponse = (text) => {
-    if (!synthRef.current || isMuted) return;
-    synthRef.current.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    synthRef.current.speak(utterance);
+      synthRef.current.speak(utterance);
+    }
   };
 
-  const toggleListening = () => {
-    if (!recognitionRef.current) {
-      setError("Speech recognition not initialized");
-      return;
-    }
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      setTranscript("");
-      setError(null);
+  // Start listening
+  const startListening = () => {
+    if (!isListening && !isSpeaking && recognitionRef.current) {
+      setIsListening(true);
       recognitionRef.current.start();
     }
   };
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (synthRef.current?.speaking && !isMuted) {
-      synthRef.current.cancel();
+  // Stop listening
+  const stopListening = () => {
+    if (isListening && recognitionRef.current) {
+      setIsListening(false);
+      recognitionRef.current.stop();
     }
   };
 
-  const toggleChatHistory = () => {
-    setShowChatHistory(!showChatHistory);
+  // Toggle speech recognition (button handler)
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  // Handle speech input
+  const handleSpeechInput = async (userText) => {
+    setStatus("Processing your request...");
+
+    try {
+      // Stop listening while processing
+      stopListening();
+
+      const res = await axios.post(
+        `http://localhost:5000/api/chat/ai`,
+        { userMsg: userText, charId, roomId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        setResponse(res.data.mainResponse);
+        speak(res.data.mainResponse);
+      } else {
+        setStatus("Error processing your request");
+        // Auto-restart listening if there's an error
+        startListening();
+      }
+    } catch (error) {
+      console.error("Error processing speech input:", error);
+      setStatus("Error connecting to server");
+      // Auto-restart listening if there's an error
+      startListening();
+    }
+  };
+
+  const toggleAnimation = () => {
+    setIsAnimating((prev) => !prev);
+  };
+
+  const increaseSpeed = () => {
+    setAnimationSpeed((prev) => Math.max(500, prev - 500));
+  };
+
+  const decreaseSpeed = () => {
+    setAnimationSpeed((prev) => Math.min(5000, prev + 500));
+  };
+
+  const changeColor = () => {
+    const colors = ["blue", "purple", "green", "pink"];
+    const currentIndex = colors.indexOf(colorScheme);
+    const nextIndex = (currentIndex + 1) % colors.length;
+    setColorScheme(colors[nextIndex]);
+  };
+
+  const fetchRandomData = async () => {
+    setLoading(true);
+    setStatus("Fetching data...");
+
+    try {
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/posts/1"
+      );
+      const message = `Data fetched! Title: ${response.data.title.substring(
+        0,
+        20
+      )}...`;
+      setStatus(message);
+      setResponse(message);
+      speak(message);
+
+      // Change animation based on response
+      setAnimationSpeed(1500);
+      setPulse(true);
+      setTimeout(() => setPulse(false), 500);
+    } catch (error) {
+      const errorMsg = "Error fetching data";
+      setStatus(errorMsg);
+      setResponse(errorMsg);
+      speak(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getGradientClass = () => {
+    switch (colorScheme) {
+      case "purple":
+        return "from-purple-500 to-white";
+      case "green":
+        return "from-green-500 to-white";
+      case "pink":
+        return "from-pink-500 to-white";
+      default:
+        return "from-blue-500 to-white";
+    }
+  };
+
+  const getSecondaryGradientClass = () => {
+    switch (colorScheme) {
+      case "purple":
+        return "to-purple-300";
+      case "green":
+        return "to-green-300";
+      case "pink":
+        return "to-pink-300";
+      default:
+        return "to-blue-300";
+    }
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-screen bg-gray-900">
-      {/* Error display */}
-      {error && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded z-50">
-          {error}
-        </div>
-      )}
-
-      {/* Chat history panel */}
-      {showChatHistory && (
-        <div className="absolute left-1/2 transform -translate-x-1/2 top-16 bg-gray-800/90 backdrop-blur-sm rounded-xl p-4 w-4/5 max-w-lg z-50 h-1/2 overflow-hidden flex flex-col">
-          <h3 className="text-blue-100 font-medium mb-3">Chat History</h3>
-          <div className="flex-1 overflow-y-auto pr-2 space-y-3">
-            {chatHistory.length > 0 ? (
-              chatHistory.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.type === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`rounded-lg px-4 py-2 max-w-xs md:max-w-md ${
-                      message.type === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-700 text-blue-100"
-                    }`}
-                  >
-                    <p className="text-sm">{message.content}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center text-gray-400 py-8">
-                No messages yet
-              </div>
-            )}
-          </div>
-          <button
-            className="bg-gray-700 hover:bg-gray-600 text-blue-200 text-sm py-2 mt-3 rounded-md transition-colors"
-            onClick={toggleChatHistory}
-          >
-            Close History
-          </button>
-        </div>
-      )}
-
-      {/* Main interface */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+    <div className="flex flex-col items-center justify-center w-full h-screen bg-gray-900 p-6">
+      <div
+        className={`relative w-64 h-64 rounded-full bg-gradient-to-br ${getGradientClass()} overflow-hidden transition-all duration-1000 ease-in-out ${
+          pulse ? "scale-105" : "scale-100"
+        } ${loading ? "animate-pulse" : ""}`}
+      >
         <div
-          className={`w-40 h-40 rounded-full bg-gradient-to-b from-blue-400 via-blue-600 to-indigo-800 flex items-center justify-center transition-all duration-300 ${
-            isListening
-              ? "scale-110 shadow-lg shadow-blue-500/50"
-              : isLoading
-              ? "scale-105 shadow-md shadow-blue-500/30"
-              : "shadow-sm shadow-blue-500/20"
+          className={`absolute inset-0 bg-gradient-to-br from-transparent ${getSecondaryGradientClass()} opacity-70 ${
+            isAnimating ? "animate-pulse" : ""
           }`}
-        >
-          <div className="w-36 h-36 rounded-full bg-gray-900 flex items-center justify-center">
-            {isLoading ? (
-              <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <div className="relative w-24 h-24 flex items-center justify-center">
-                <div className="absolute w-24 h-24 rounded-full bg-blue-600/20 animate-ping"></div>
-                <div className="absolute w-16 h-16 rounded-full bg-blue-500/30"></div>
-                <div className="w-10 h-10 rounded-full bg-blue-400/50"></div>
-              </div>
-            )}
-          </div>
-        </div>
+        ></div>
+        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-white rounded-full blur-md animate-pulse"></div>
+        <div
+          className={`absolute -inset-1/4 bg-gradient-to-t from-transparent to-white opacity-20 ${
+            isAnimating ? "animate-spin" : ""
+          } duration-8000`}
+        ></div>
 
-        {/* Response display */}
-        {response && !showChatHistory && (
-          <div className="absolute -bottom-32 w-80 max-h-24 overflow-y-auto text-center p-4 rounded-xl bg-gray-800/80 backdrop-blur-sm">
-            <p className="text-blue-100 text-sm">{response}</p>
+        {/* Voice activity indicator */}
+        {isListening && (
+          <div className="absolute inset-0 border-4 border-white rounded-full animate-ping opacity-50"></div>
+        )}
+
+        {/* Speaking indicator */}
+        {isSpeaking && (
+          <div className="absolute inset-0 border-4 border-blue-400 rounded-full animate-pulse opacity-70"></div>
+        )}
+      </div>
+
+      {/* Speech text display */}
+      <div className="mt-6 w-full max-w-lg">
+        {transcript && (
+          <div className="mb-3 bg-gray-800 p-3 rounded-lg">
+            <p className="text-sm text-gray-400">You said:</p>
+            <p className="text-white">{transcript}</p>
+          </div>
+        )}
+
+        {response && (
+          <div className="mb-3 bg-gray-700 p-3 rounded-lg">
+            <p className="text-sm text-gray-400">Response:</p>
+            <p className="text-white">{response}</p>
           </div>
         )}
       </div>
 
-      {/* Transcript display */}
-      {transcript && !showChatHistory && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-4/5 max-w-md z-10">
-          <div className="bg-gray-800/80 backdrop-blur-sm px-4 py-3 rounded-lg">
-            <p className="text-blue-200 text-sm text-center">"{transcript}"</p>
-          </div>
+      <div className="mt-6 flex flex-wrap justify-center gap-4">
+        <button
+          onClick={toggleListening}
+          className={`flex items-center gap-2 ${
+            isListening
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-green-600 hover:bg-green-700"
+          } text-white px-4 py-2 rounded-lg transition-colors`}
+          disabled={isSpeaking}
+        >
+          {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+          {isListening ? "Stop Listening" : "Start Listening"}
+        </button>
+
+        <button
+          onClick={toggleAnimation}
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          {isAnimating ? <Pause size={20} /> : <Play size={20} />}
+          {isAnimating ? "Pause" : "Play"}
+        </button>
+
+        <button
+          onClick={decreaseSpeed}
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          disabled={animationSpeed >= 5000}
+        >
+          Slower
+        </button>
+
+        <button
+          onClick={increaseSpeed}
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          disabled={animationSpeed <= 500}
+        >
+          Faster
+        </button>
+
+        <button
+          onClick={changeColor}
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          <Droplet size={20} />
+          Change Color
+        </button>
+
+        <button
+          onClick={fetchRandomData}
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          disabled={loading}
+        >
+          {loading ? (
+            <RefreshCw size={20} className="animate-spin" />
+          ) : (
+            <Zap size={20} />
+          )}
+          Fetch Data
+        </button>
+      </div>
+
+      {status && (
+        <div className="mt-4 text-white bg-gray-800 px-4 py-2 rounded-lg">
+          {status}
         </div>
       )}
 
-      {/* Control buttons */}
-      <div className="absolute bottom-16 flex gap-3 z-10">
-        <button
-          className={`w-14 h-14 rounded-full ${
-            isListening ? "bg-red-500" : "bg-gray-800 hover:bg-gray-700"
-          } flex items-center justify-center transition-colors duration-300`}
-          onClick={toggleListening}
-          disabled={isLoading}
-        >
-          <Mic className="text-white" size={24} />
-        </button>
-
-        <button
-          className="w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-300"
-          onClick={toggleMute}
-        >
-          {isMuted ? (
-            <Volume2 className="text-white" size={22} />
-          ) : (
-            <Volume2 className="text-white" size={22} />
-          )}
-        </button>
-
-        <button
-          className="w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-300"
-          onClick={toggleChatHistory}
-        >
-          <MessageSquare className="text-white" size={22} />
-        </button>
+      <div className="mt-4 text-gray-400">
+        Animation Speed: {animationSpeed}ms | Color: {colorScheme} |
+        {isSpeaking ? " Speaking" : isListening ? " Listening" : " Idle"}
       </div>
     </div>
   );

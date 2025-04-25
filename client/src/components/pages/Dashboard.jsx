@@ -7,6 +7,7 @@ import {
   LogOut,
   Settings,
   Search,
+  Star,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +17,14 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    createdAt: new Date(),
+  });
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -28,14 +36,23 @@ function Dashboard() {
 
     // Then navigate to login page
     navigate("/login");
+    window.location.reload();
   };
 
   const handleLoadCourses = () => {
     navigate("/Morecourse");
   };
+
   const handleCharacterClick = (charId) => {
-    navigate("/voice-interface", { state: { charId: charId } });
+    setSelectedCharacter(charId);
+    navigate(`/chat/${charId}`);
   };
+
+  // Function to get character messages
+  const getCharacterMessages = (characterId) => {
+    return "Hello! I'm here to help you learn. What would you like to know about today?";
+  };
+
   ///fetch user data from the server
   useEffect(() => {
     const fetchUserData = async () => {
@@ -50,7 +67,7 @@ function Dashboard() {
           setUserData(
             response.data.user
               ? response.data.user
-              : { username: "", email: "" }
+              : { username: "", email: "", name: "", createdAt: new Date() }
           );
         } else {
           alert("Something went wrong, please try again later.");
@@ -62,6 +79,7 @@ function Dashboard() {
 
     fetchUserData();
   }, []);
+
   // Effect to simulate fetching courses from external source
   useEffect(() => {
     const fetchEnrolledCourses = () => {
@@ -89,7 +107,7 @@ function Dashboard() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        console.log(response.data);
+        //console.log(response.data);
         // Extract the allCharacters array from the response
         if (response.data && response.data.allCharacters) {
           setAiCharacters(response.data.allCharacters);
@@ -116,18 +134,29 @@ function Dashboard() {
         )
       : [];
 
+  // Current character based on selection
+  const currentCharacter = selectedCharacter
+    ? aiCharacters.find(
+        (char) =>
+          char.charId === selectedCharacter || char._id === selectedCharacter
+      )
+    : null;
+
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
       {/* Sidebar */}
       <div className="w-64 p-4 flex flex-col bg-white border-r">
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-6">Learning Portal</h2>
-
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 bg-blue-500 text-white">
-              {userData.username}
+              {userData?.name?.charAt(0)?.toUpperCase() ||
+                userData?.username?.charAt(0)?.toUpperCase() ||
+                ""}
             </div>
-            <h3 className="font-medium">{userData.name}</h3>
+            <h3 className="font-medium">
+              {userData.name || userData.username}
+            </h3>
             <p className="text-sm text-gray-500">{userData.email}</p>
           </div>
         </div>
@@ -202,7 +231,6 @@ function Dashboard() {
                     className="p-6 rounded-lg bg-white shadow-md"
                   >
                     <h3 className="text-lg font-bold mb-2">{course.title}</h3>
-                    <div className="mb-4"></div>
                   </div>
                 ))}
               </div>
@@ -235,8 +263,8 @@ function Dashboard() {
                 </div>
                 <input
                   type="text"
-                  className="block w-full p-2 pl-10 text-sm border border-gray-300 rounded-lg bg-white"
-                  placeholder="Search characters..."
+                  className="block w-full p-2 pl-10 text-sm border border-gray-300 rounded-lg"
+                  placeholder="Search characters by name or type..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -270,7 +298,9 @@ function Dashboard() {
                     </p>
                     <button
                       className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
-                      onClick={() => handleCharacterClick(character.charId)}
+                      onClick={() =>
+                        handleCharacterClick(character.charId || character._id)
+                      }
                     >
                       Talk to {character.name}
                     </button>
@@ -297,7 +327,7 @@ function Dashboard() {
             <div className="p-6 rounded-lg bg-white shadow-md">
               <div className="flex items-center mb-6">
                 <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mr-4 bg-blue-500 text-white">
-                  {userData.username.charAt(0)}
+                  {userData.username?.charAt(0)?.toUpperCase() || ""}
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">{userData.username}</h2>
@@ -320,7 +350,7 @@ function Dashboard() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Member Since</p>
-                        <p>{userData.createdAt.toString()}</p>
+                        <p>{userData.createdAt?.toString() || "N/A"}</p>
                       </div>
                     </div>
                   </div>
