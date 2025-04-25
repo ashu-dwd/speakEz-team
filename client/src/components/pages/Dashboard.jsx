@@ -17,12 +17,7 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-  const [selectedCharacter, setSelectedCharacter] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
-=======
   const [userData, setUserData] = useState({});
->>>>>>> edcac16fe5eb93d4e4faffb787bf6638a46fb373
   const navigate = useNavigate();
 
   const handleSignOut = () => {
