@@ -4,30 +4,31 @@ import Room from "../models/room.js";
 import aiChar from "../models/aiChar.js";
 import Chat from "../models/chat.js";
 
-
 const generateChatRoomId = async (req, res) => {
-    const { charId } = req.body;
-    console.log(charId);
-    if (!charId) return res.status(400).json({ error: "Character ID is required" });
-    const roomId = nanoid(10);
-    await Room.create({
-        roomId: roomId,
-        charId: charId,
-        userId: req.user.userId,
-    });
-    return res.status(200).json({ roomId: roomId, success: true });
-}
+  const { charId } = req.body;
+  console.log(charId);
+  if (!charId)
+    return res.status(400).json({ error: "Character ID is required" });
+  const roomId = nanoid(10);
+  await Room.create({
+    roomId: roomId,
+    charId: charId,
+    userId: req.user ? userId : "680741a975fa6ff05775336a",
+  });
+  return res.status(200).json({ roomId: roomId, success: true });
+};
 const handleUserConvo = async (req, res) => {
-    const { charId, roomId } = req.body;
-    const { userMsg } = req.body;
-    console.log(charId, roomId);
-    const isRoomExist = await Room.findOne({ roomId });
-    if (!isRoomExist) return res.status(400).json({ error: "Room not found" });
-    const isCharExist = await aiChar.findOne({ charId });
-    if (!isCharExist) return res.status(400).json({ error: "Character not found" });
-    const charResponse = await handler(userMsg, charId);
-    await Chat.create({ roomId, userMsg, charMsg: charResponse });
-    return res.status(200).json({ charResponse, success: true });
-}
+  const { charId, roomId } = req.body;
+  const { userMsg } = req.body;
+  console.log(charId, roomId);
+  const isRoomExist = await Room.findOne({ roomId });
+  if (!isRoomExist) return res.status(400).json({ error: "Room not found" });
+  const isCharExist = await aiChar.findOne({ charId });
+  if (!isCharExist)
+    return res.status(400).json({ error: "Character not found" });
+  const charResponse = await handler(userMsg, charId);
+  await Chat.create({ roomId, userMsg, charMsg: charResponse });
+  return res.status(200).json({ charResponse, success: true });
+};
 
 export { generateChatRoomId, handleUserConvo };

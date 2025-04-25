@@ -49,12 +49,22 @@ export default function VoiceInteractiveCircle() {
 
     const fetchRoomId = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/chat`, {
-          params: { charId },
-        });
-
+        const response = await axios.post(
+          `http://localhost:5000/api/chat`,
+          {
+            charId: charId,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        
         if (response.data.success) {
           setRoomId(response.data.roomId);
+          console.log("Room ID:", response.data.roomId);
         } else {
           console.error("Error fetching room ID:", response.data.error);
         }
@@ -210,6 +220,12 @@ export default function VoiceInteractiveCircle() {
       // Stop listening while processing
       stopListening();
 
+      if (!charId || !roomId) {
+        setStatus("Error: Character or room not initialized");
+        startListening();
+        return;
+      }
+
       const res = await axios.post(
         `http://localhost:5000/api/chat/ai`,
         { userMsg: userText, charId, roomId },
@@ -222,8 +238,15 @@ export default function VoiceInteractiveCircle() {
       );
 
       if (res.data.success) {
-        setResponse(res.data.mainResponse);
-        speak(res.data.mainResponse);
+        // Extract mainResponse from the returned data structure
+        const responseData = res.data.charResponse;
+        const mainResponse = typeof responseData === 'object' ? 
+          responseData.mainResponse : 
+          responseData;
+        
+        setResponse(mainResponse);
+        speak(mainResponse);
+        setStatus("");
       } else {
         setStatus("Error processing your request");
         // Auto-restart listening if there's an error
@@ -366,7 +389,7 @@ export default function VoiceInteractiveCircle() {
             isListening
               ? "bg-red-600 hover:bg-red-700"
               : "bg-green-600 hover:bg-green-700"
-          } text-white px-4 py-2 rounded-lg transition-colors`}
+          } text-white px-4 py-2 rounded-full transition-colors`}
           disabled={isSpeaking}
         >
           {isListening ? <MicOff size={20} /> : <Mic size={20} />}
@@ -375,7 +398,7 @@ export default function VoiceInteractiveCircle() {
 
         <button
           onClick={toggleAnimation}
-          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition-colors"
         >
           {isAnimating ? <Pause size={20} /> : <Play size={20} />}
           {isAnimating ? "Pause" : "Play"}
@@ -383,7 +406,7 @@ export default function VoiceInteractiveCircle() {
 
         <button
           onClick={decreaseSpeed}
-          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition-colors"
           disabled={animationSpeed >= 5000}
         >
           Slower
@@ -391,7 +414,7 @@ export default function VoiceInteractiveCircle() {
 
         <button
           onClick={increaseSpeed}
-          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition-colors"
           disabled={animationSpeed <= 500}
         >
           Faster
@@ -399,7 +422,7 @@ export default function VoiceInteractiveCircle() {
 
         <button
           onClick={changeColor}
-          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition-colors"
         >
           <Droplet size={20} />
           Change Color
@@ -407,7 +430,7 @@ export default function VoiceInteractiveCircle() {
 
         <button
           onClick={fetchRandomData}
-          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition-colors"
           disabled={loading}
         >
           {loading ? (
@@ -420,7 +443,7 @@ export default function VoiceInteractiveCircle() {
       </div>
 
       {status && (
-        <div className="mt-4 text-white bg-gray-800 px-4 py-2 rounded-lg">
+        <div className="mt-4 text-white bg-gray-800 px-4 py-2 rounded-full">
           {status}
         </div>
       )}
