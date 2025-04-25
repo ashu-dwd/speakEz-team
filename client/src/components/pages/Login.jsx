@@ -42,6 +42,7 @@ const Login = () => {
 
       if (success && data) {
         setUser(user);
+        localStorage.setItem("user", JSON.stringify(user))
         localStorage.setItem("token", data);
         localStorage.setItem("authState", "true");
 

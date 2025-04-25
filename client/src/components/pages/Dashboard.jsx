@@ -7,6 +7,7 @@ import {
   LogOut,
   Settings,
   Search,
+  Star,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,12 +17,10 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 7804dd2faccd517d4a8ec8899fe6d789c50602ea
   const handleSignOut = () => {
     // Clear any auth tokens or user data from localStorage
     localStorage.removeItem("user");
@@ -36,8 +35,15 @@ function Dashboard() {
   const handleLoadCourses = () => {
     navigate("/Morecourse");
   };
+  
   const handleCharacterClick = (charId) => {
-    navigate("/voice-interface", { state: { charId: charId } });
+    // Set the selected character when clicking on a character card
+    setSelectedCharacter(charId);
+  };
+
+  // Function to get character messages
+  const getCharacterMessages = (characterId) => {
+    return "Hello! I'm here to help you learn. What would you like to know about today?";
   };
 
   // Mock user data
@@ -96,13 +102,17 @@ function Dashboard() {
         )
       : [];
 
+  // Current character based on selection
+  const currentCharacter = selectedCharacter 
+    ? aiCharacters.find(char => char.charId === selectedCharacter || char._id === selectedCharacter) 
+    : null;
+
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
       {/* Sidebar */}
       <div className="w-64 p-4 flex flex-col bg-white border-r">
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-6">Learning Portal</h2>
-
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 bg-blue-500 text-white">
               {userData.username.charAt(0)}
@@ -129,7 +139,7 @@ function Dashboard() {
               <button
                 onClick={() => setActivePage("ai-characters")}
                 className={`flex items-center w-full p-2 rounded-lg ${
-                  activePage === "ai-characters"
+                activePage === "ai-characters"
                     ? "bg-gray-200"
                     : "hover:bg-gray-200"
                 }`}
@@ -155,13 +165,7 @@ function Dashboard() {
         <div className="mt-auto pt-4 border-t border-gray-200">
           <button
             onClick={handleSignOut}
-<<<<<<< HEAD
-            className={`flex items-center w-full p-2 rounded-lg ${
-              darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
-            } text-red-500 hover:text-red-600`}
-=======
             className="flex items-center w-full p-2 rounded-lg hover:bg-gray-200"
->>>>>>> 7804dd2faccd517d4a8ec8899fe6d789c50602ea
           >
             <LogOut size={20} className="mr-3" />
             <span>Sign Out</span>
@@ -188,7 +192,6 @@ function Dashboard() {
                     className="p-6 rounded-lg bg-white shadow-md"
                   >
                     <h3 className="text-lg font-bold mb-2">{course.title}</h3>
-                    <div className="mb-4"></div>
                   </div>
                 ))}
               </div>
@@ -208,13 +211,28 @@ function Dashboard() {
             )}
           </div>
         )}
-
+ 
         {activePage === "ai-characters" && (
           <div className="p-6 h-full">
             <h1 className="text-2xl font-bold mb-6">AI Characters</h1>
 
-<<<<<<< HEAD
-            {selectedCharacter ? (
+            {/* Search bar */}
+            <div className="mb-6">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search size={18} className="text-gray-500" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full p-2 pl-10 text-sm border border-gray-300 rounded-lg bg-white"
+                  placeholder="Search characters..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {selectedCharacter && currentCharacter ? (
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
@@ -223,7 +241,7 @@ function Dashboard() {
                         darkMode ? "bg-indigo-600" : "bg-indigo-500"
                       } text-white`}
                     >
-                      {currentCharacter.avatar}
+                      {currentCharacter.name ? currentCharacter.name.charAt(0) : "AI"}
                     </div>
                     <div>
                       <div className="flex items-center">
@@ -236,7 +254,7 @@ function Dashboard() {
                             className="text-yellow-400 fill-yellow-400"
                           />
                           <span className="ml-1">
-                            {currentCharacter.rating}
+                            {currentCharacter.rating || "4.5"}
                           </span>
                         </div>
                       </div>
@@ -245,7 +263,7 @@ function Dashboard() {
                           darkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {currentCharacter.type}
+                        {currentCharacter.type || "AI Assistant"}
                       </p>
                       <p
                         className={`text-xs ${
@@ -264,7 +282,8 @@ function Dashboard() {
                         : "bg-green-600 hover:bg-green-700 text-white"
                     }`}
                     style={{ minWidth:'auto', maxWidth: 'fit-content', width: 'auto' }}
-                  > Change
+                  > 
+                    Change
                   </button>
                 </div>
 
@@ -279,14 +298,14 @@ function Dashboard() {
                         darkMode ? "bg-indigo-600" : "bg-indigo-500"
                       } text-white text-lg`}
                     >
-                      {currentCharacter.avatar}
+                      {currentCharacter.name ? currentCharacter.name.charAt(0) : "AI"}
                     </div>
                     <div
                       className={`p-3 rounded-lg max-w-3xl ${
                         darkMode ? "bg-gray-700" : "bg-gray-100"
                       }`}
                     >
-                      <p>{getCharacterMessages(currentCharacter.id)}</p>
+                      <p>{getCharacterMessages(currentCharacter.charId || currentCharacter._id)}</p>
                     </div>
                   </div>
 
@@ -320,71 +339,59 @@ function Dashboard() {
                         : "bg-white border-gray-300"
                     } border focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                   />
-                  <button className="bg-green-600 text-white px-3 py-1 rounded-r-lg hover:bg-green-700 text-sm shrink-0 w-auto">
+                  <button className="bg-green-600 text-white px-3 py-3 rounded-r-lg hover:bg-green-700 text-sm h-full">
                     Send
                   </button>
-=======
-            {/* Search bar */}
-            <div className="mb-6">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <Search size={18} className="text-gray-500" />
->>>>>>> 7804dd2faccd517d4a8ec8899fe6d789c50602ea
                 </div>
-                <input
-                  type="text"
-                  className="block w-full p-2 pl-10 text-sm border border-gray-300 rounded-lg bg-white"
-                  placeholder="Search characters..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
               </div>
-            </div>
-
-            {/* Loading state */}
-            {aiCharacters.length === 0 && (
-              <div className="flex flex-col items-center justify-center p-12">
-                <div className="w-16 h-16 border-4 border-t-blue-500 rounded-full animate-spin mb-4 border-gray-200"></div>
-                <p className="text-lg">Loading characters...</p>
-              </div>
-            )}
-
-            {/* AI Characters grid */}
-            {aiCharacters.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCharacters.map((character) => (
-                  <div
-                    key={character.charId || character._id}
-                    className="p-6 rounded-lg bg-white shadow-md"
-                  >
-                    <img
-                      src={character.image || "/api/placeholder/300/300"}
-                      alt={character.name}
-                      className="w-full h-48 object-cover rounded-t-lg mb-4"
-                    />
-                    <h3 className="text-lg font-bold mb-2">{character.name}</h3>
-                    <p className="mb-4 text-gray-500">
-                      {character.description}
-                    </p>
-                    <button
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
-                      onClick={() => handleCharacterClick(character.charId)}
-                    >
-                      Talk to {character.name}
-                    </button>
+            ) : (
+              <>
+                {/* Loading state */}
+                {aiCharacters.length === 0 && (
+                  <div className="flex flex-col items-center justify-center p-12">
+                    <div className="w-16 h-16 border-4 border-t-blue-500 rounded-full animate-spin mb-4 border-gray-200"></div>
+                    <p className="text-lg">Loading characters...</p>
                   </div>
-                ))}
-              </div>
-            )}
+                )}
 
-            {/* Show message if no characters found */}
-            {aiCharacters.length > 0 && filteredCharacters.length === 0 && (
-              <div className="p-8 rounded-lg text-center bg-white shadow-md">
-                <h3 className="text-lg mb-2">No characters found</h3>
-                <p className="mb-4 text-gray-500">
-                  Try adjusting your search query.
-                </p>
-              </div>
+                {/* AI Characters grid */}
+                {aiCharacters.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredCharacters.map((character) => (
+                      <div
+                        key={character.charId || character._id}
+                        className="p-6 rounded-lg bg-white shadow-md"
+                      >
+                        <img
+                          src={character.image || "/api/placeholder/300/300"}
+                          alt={character.name}
+                          className="w-full h-48 object-cover rounded-t-lg mb-4"
+                        />
+                        <h3 className="text-lg font-bold mb-2">{character.name}</h3>
+                        <p className="mb-4 text-gray-500">
+                          {character.description}
+                        </p>
+                        <button
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full"
+                          onClick={() => handleCharacterClick(character.charId || character._id)}
+                        >
+                          Talk to {character.name}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Show message if no characters found */}
+                {aiCharacters.length > 0 && filteredCharacters.length === 0 && (
+                  <div className="p-8 rounded-lg text-center bg-white shadow-md">
+                    <h3 className="text-lg mb-2">No characters found</h3>
+                    <p className="mb-4 text-gray-500">
+                      Try adjusting your search query.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

@@ -1,13 +1,26 @@
 // client/src/context/authContext.js
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
-
 const AuthProvider = ({ children }) => {
+
   const [user, setUser] = useState(null);
 
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.setItem("authState", "false");
+  };
+    return (
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
