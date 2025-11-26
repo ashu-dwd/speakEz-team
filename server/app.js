@@ -26,6 +26,11 @@ app.use("/api/userData", verifyToken, userDataRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/aiChar", verifyToken, aiCharRoute);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;

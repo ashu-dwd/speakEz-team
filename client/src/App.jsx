@@ -25,14 +25,14 @@ import Blog from "./components/Blog/Blog";
 import BlogDetails from "./components/Blog/BlogDetails";
 import Aicharacter from "./components/Aicharacter/Aicharacter";
 import Verifyotp from "./components/pages/Verifyotp";
-import Payment from "./components/Payment/Payment";
+import Payment from "./components/payment/Payment";
 import ResetPassword from "./components/Resetpassword/Resetpassword";
 import VoiceInterface from "./components/pages/voiceInterface";
 import Grammar from "./components/Grammar/Grammar";
 import Pronunciation from "./components/Pronounciation/Pronounciation";
 import Faq from "./components/Faq/Faq";
 import TermsOfUse from "./components/Termsofuse/Termsofuse";
-import PrivacyPolicy from "./components/Privacypolicy/Privacypolicy";
+import PrivacyPolicy from "./components/Privacy/Privacy";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();

@@ -4,9 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node --experimental-require-module app.js",
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -18,11 +18,21 @@
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.2",
     "multer": "^1.4.5-lts.2",
     "nanoid": "^5.1.5",
     "nodemailer": "^6.10.1",
     "pm2": "^6.0.5"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "babel-jest": "^30.2.0",
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^10.3.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^7.1.4"
   }
 }
