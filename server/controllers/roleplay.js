@@ -63,7 +63,7 @@ If a user asks something unrelated to English learning, gently redirect them to 
                 .replace(/\n/g, "");
         }
         const response = JSON.parse(clearResponseString(fullResponse));
-        console.log(response);
+        // console.log(response);
         // console.log(clearResponseString(fullResponse));
 
         return response || fullResponse;

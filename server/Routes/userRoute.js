@@ -46,7 +46,7 @@ Router.post("/verify-reset-token", async (req, res) => {
         const tokenData = await PassReset.findOne({
             token
         });
-        console.log(tokenData);
+        // console.log(tokenData);
 
         if (!tokenData) {
             return res.status(400).json({ error: "Invalid or expired token" });
@@ -63,11 +63,11 @@ Router.post("/reset-password/:token", async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decoded);
+        // console.log(decoded);
         const user = await User.findOne({
             _id: decoded.userId
         });
-        console.log(user);
+        // console.log(user);
 
         if (!user) return res.status(400).json({ error: "Invalid or expired token" });
 

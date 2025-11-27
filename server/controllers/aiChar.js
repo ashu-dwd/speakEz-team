@@ -12,7 +12,7 @@ const generateCharacter = async (req, res) => {
         }
 
         const charId = nanoid(8);
-        console.log(req.user)
+        // console.log(req.user)
 
         const newCharacter = await aiChar.create({
             charId,

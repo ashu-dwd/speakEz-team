@@ -8,8 +8,10 @@ import {
   Settings,
   Search,
   Star,
+  PlusCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Aicharacter from "../Aicharacter/Aicharacter";
 
 function Dashboard() {
   const [activePage, setActivePage] = useState("courses");
@@ -37,6 +39,10 @@ function Dashboard() {
     // Then navigate to login page
     navigate("/login");
     window.location.reload();
+  };
+
+  const handleCreateCharacter = () => {
+    setActivePage("create-character");
   };
 
   const handleLoadCourses = () => {
@@ -185,6 +191,19 @@ function Dashboard() {
               >
                 <MessageSquare size={20} className="mr-3" />
                 <span>AI Characters</span>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={handleCreateCharacter}
+                className={`flex items-center w-full p-2 rounded-lg ${
+                  activePage === "create-character"
+                    ? "bg-gray-200"
+                    : "hover:bg-gray-200"
+                }`}
+              >
+                <PlusCircle size={20} className="mr-3" />
+                <span>Create AI Character</span>
               </button>
             </li>
             <li>
@@ -383,6 +402,12 @@ function Dashboard() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+        
+        {activePage === "create-character" && (
+          <div className="p-6">
+            <Aicharacter />
           </div>
         )}
       </div>

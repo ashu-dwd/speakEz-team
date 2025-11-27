@@ -33,6 +33,7 @@ import Pronunciation from "./components/Pronounciation/Pronounciation";
 import Faq from "./components/Faq/Faq";
 import TermsOfUse from "./components/Termsofuse/Termsofuse";
 import PrivacyPolicy from "./components/Privacy/Privacy";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -57,7 +58,14 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<Forgotpassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/verify-otp" element={<Verifyotp />} />
         <Route path="/practicewithai" element={<Practicewithai />} />
         <Route path="/Morecourse" element={<Morecourse />} />
@@ -66,10 +74,16 @@ const App = () => {
         <Route path="/developer" element={<Developer />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetails />} />
-        <Route path="/aicharacter" element={<Aicharacter />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/chat/:charId" element={<VoiceInterface />} />
+        <Route 
+          path="/chat/:charId" 
+          element={
+            <ProtectedRoute>
+              <VoiceInterface />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/grammar" element={<Grammar />} />
         <Route path="/pronounciation" element={<Pronunciation />} />
         <Route path="/faq" element={<Faq />} />

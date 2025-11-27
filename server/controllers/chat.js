@@ -6,7 +6,7 @@ import Chat from "../models/chat.js";
 
 const generateChatRoomId = async (req, res) => {
   const { charId } = req.body;
-  console.log(charId);
+  // console.log(charId);
   if (!charId)
     return res.status(400).json({ error: "Character ID is required" });
   const roomId = nanoid(10);
@@ -20,7 +20,7 @@ const generateChatRoomId = async (req, res) => {
 const handleUserConvo = async (req, res) => {
   const { charId, roomId } = req.body;
   const { userMsg } = req.body;
-  console.log(charId, roomId);
+  // console.log(charId, roomId);
   const isRoomExist = await Room.findOne({ roomId });
   if (!isRoomExist) return res.status(400).json({ error: "Room not found" });
   const isCharExist = await aiChar.findOne({ charId });

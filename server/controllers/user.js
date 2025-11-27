@@ -35,7 +35,7 @@ const handleUserSignup = async (email, password, name) => {
 
 const handleUserSignin = async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
+  // console.log(email, password);
   if (!email || !password) {
     return res.status(400).json({ error: "Please fill all the fields" });
   }
@@ -44,6 +44,7 @@ const handleUserSignin = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    // console.log(user);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid credentials" });
@@ -76,7 +77,7 @@ const handleOtpVerification = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    console.log(user);
+    // console.log(user);
 
     if (parseInt(user.otp) !== parseInt(otp)) {
       return res.status(400).json({ error: "Invalid OTP" });
