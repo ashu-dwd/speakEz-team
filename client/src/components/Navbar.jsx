@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "/favicon.png";
-import "./Navbar.css";
+import "../assets/Navbar.css";
 import { auth } from "../Firebase";
 import { AuthContext } from "../context/authContext";
 

@@ -1,38 +1,38 @@
 import React, { useEffect } from "react";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
-import Home from "./components/pages/Home";
-import Helpdesk from "./components/pages/Helpdesk";
-import About from "./components/pages/About";
-import Signup from "./components/pages/Signup";
-import Login from "./components/pages/Login";
-import Forgotpassword from "./components/pages/Forgot-password";
-import Dashboard from "./components/pages/Dashboard";
+import Home from "./pages/Home";
+import Helpdesk from "./pages/Helpdesk";
+import About from "./pages/About";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import Dashboard from "./pages/Dashboard";
 //import "./App.css";
-import Footer from "./components/Footer/Footer";
+import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
-import Practicewithai from "./components/pages/Practice";
-import Morecourse from "./components/Morecourse/Morecourse";
-import Coursedetail from "./components/Coursedetails/Coursedetails";
-import Vocabulary from "./components/pages/Vocabulary";
-import Contact from "./components/pages/Contact";
-import Developer from "./components/Developer/Developer";
-import Blog from "./components/Blog/Blog";
-import BlogDetails from "./components/Blog/BlogDetails";
-import Verifyotp from "./components/pages/Verifyotp";
-import Payment from "./components/payment/Payment";
-import ResetPassword from "./components/Resetpassword/Resetpassword";
-import VoiceInterface from "./components/pages/voiceInterface";
-import Grammar from "./components/Grammar/Grammar";
-import Pronunciation from "./components/Pronounciation/Pronounciation";
-import Faq from "./components/Faq/Faq";
-import TermsOfUse from "./components/Termsofuse/Termsofuse";
-import PrivacyPolicy from "./components/Privacy/Privacy";
+import PracticeWithAi from "./pages/Practice";
+import Morecourse from "./components/Morecourse";
+import CourseDetail from "./components/Coursedetails";
+import Vocabulary from "./pages/Vocabulary";
+import Contact from "./pages/Contact";
+import Developer from "./components/Developer";
+import Blog from "./components/Blog";
+import BlogDetails from "./components/BlogDetails";
+import VerifyOtp from "./pages/VerifyOtp";
+import Payment from "./components/Payment";
+import ResetPassword from "./components/Resetpassword";
+import VoiceInterface from "./pages/VoiceInterface";
+import Grammar from "./components/Grammar";
+import Pronunciation from "./components/Pronounciation";
+import Faq from "./components/Faq";
+import TermsOfUse from "./components/Termsofuse";
+import PrivacyPolicy from "./components/Privacy";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const ScrollToTop = () => {
@@ -59,7 +59,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<Forgotpassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
             path="/dashboard"
             element={
@@ -68,10 +68,10 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/verify-otp" element={<Verifyotp />} />
-          <Route path="/practicewithai" element={<Practicewithai />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/practicewithai" element={<PracticeWithAi />} />
           <Route path="/courses" element={<Morecourse />} />
-          <Route path="/course/:courseId" element={<Coursedetail />} />
+          <Route path="/course/:courseId" element={<CourseDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/developer" element={<Developer />} />
           <Route path="/blog" element={<Blog />} />
