@@ -7,6 +7,9 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', sans-serif;
 }
+.practice-container {
+  margin-top: 200px !important;
+}
 
 .practice-container h2 {
   text-align: center;
@@ -87,4 +90,3 @@
   margin: 0.5rem 0 0;
   color: #444;
 }
-

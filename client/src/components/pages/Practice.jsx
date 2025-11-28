@@ -84,7 +84,7 @@ const Practice = () => {
   };
 
   return (
-    <div className="practice-container">
+    <div className="practice-container has-navbar-spacing">
       <h2>🎤 AI Speech Practice</h2>
       <p className="timer">Timer: {formatTime()}</p>
       <p className="status">{listening ? 'Listening...' : 'Not Listening'} </p>
@@ -116,4 +116,3 @@ const Practice = () => {
 };
 
 export default Practice;
-

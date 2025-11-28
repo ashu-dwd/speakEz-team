@@ -8,8 +8,17 @@ import { AuthContext } from "../context/authContext";
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const { user, setUser, isAdmin } = useContext(AuthContext); // isAdmin assumed from context
 
@@ -88,35 +97,37 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <Link to="/" className="navbar-brand">
-        <img src={logo} alt="Logo" />
-      </Link>
+    <nav className={`navbar ${isScrolled ? "navbar-scrolled" : ""}`}>
+      <div className="navbar-container">
+        <Link to="/" className="navbar-brand">
+          <img src={logo} alt="SpeakEz Logo" />
+        </Link>
 
-      <ul className="navbar-nav">
-        {[
-          { path: "/", label: "Home" },
-          { path: "/about", label: "About" },
-          { path: "/contact", label: "Contact" },
-          { path: "/practicewithai", label: "Practice with AI" },
-        ].map(({ path, label }) => (
-          <li key={path}>
-            <Link to={path} className="nav-link">
-              {label}
-            </Link>
-          </li>
-        ))}
+        <ul className="navbar-nav">
+          {[
+            { path: "/", label: "Home" },
+            { path: "/about", label: "About" },
+            { path: "/contact", label: "Contact" },
+            { path: "/courses", label: "More Courses" },
+          ].map(({ path, label }) => (
+            <li key={path}>
+              <Link to={path} className="nav-link">
+                {label}
+              </Link>
+            </li>
+          ))}
 
-        {isAdmin && (
-          <li>
-            <Link to="/aicharacter" className="nav-link">
-              Create AI Character
-            </Link>
-          </li>
-        )}
-      </ul>
+          {isAdmin && (
+            <li>
+              <Link to="/aicharacter" className="nav-link">
+                Create AI Character
+              </Link>
+            </li>
+          )}
+        </ul>
 
-      <div className="auth-buttons">{renderAuthButtons()}</div>
+        <div className="auth-buttons">{renderAuthButtons()}</div>
+      </div>
     </nav>
   );
 };

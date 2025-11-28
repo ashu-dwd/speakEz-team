@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import toast, { Toaster } from 'react-hot-toast';
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,7 +24,6 @@ import Contact from "./components/pages/Contact";
 import Developer from "./components/Developer/Developer";
 import Blog from "./components/Blog/Blog";
 import BlogDetails from "./components/Blog/BlogDetails";
-import Aicharacter from "./components/Aicharacter/Aicharacter";
 import Verifyotp from "./components/pages/Verifyotp";
 import Payment from "./components/payment/Payment";
 import ResetPassword from "./components/Resetpassword/Resetpassword";
@@ -50,46 +50,49 @@ const App = () => {
     <>
       <ScrollToTop />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/vocabulary" element={<Vocabulary />} />
-        <Route path="/help" element={<Helpdesk />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<Forgotpassword />} />
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route path="/verify-otp" element={<Verifyotp />} />
-        <Route path="/practicewithai" element={<Practicewithai />} />
-        <Route path="/Morecourse" element={<Morecourse />} />
-        <Route path="/course/:courseId" element={<Coursedetail />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/developer" element={<Developer />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<BlogDetails />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route 
-          path="/chat/:charId" 
-          element={
-            <ProtectedRoute>
-              <VoiceInterface />
-            </ProtectedRoute>
-          } 
-        />
-        <Route path="/grammar" element={<Grammar />} />
-        <Route path="/pronounciation" element={<Pronunciation />} />
-        <Route path="/faq" element={<Faq />} />
-        <Route path="/termsofuse" element={<TermsOfUse />} />
-        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-      </Routes>
+      <Toaster />
+      <div style={{ minHeight: "100vh" }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/vocabulary" element={<Vocabulary />} />
+          <Route path="/help" element={<Helpdesk />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<Forgotpassword />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/verify-otp" element={<Verifyotp />} />
+          <Route path="/practicewithai" element={<Practicewithai />} />
+          <Route path="/courses" element={<Morecourse />} />
+          <Route path="/course/:courseId" element={<Coursedetail />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/developer" element={<Developer />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogDetails />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route
+            path="/chat/:charId"
+            element={
+              <ProtectedRoute>
+                <VoiceInterface />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/grammar" element={<Grammar />} />
+          <Route path="/pronounciation" element={<Pronunciation />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/termsofuse" element={<TermsOfUse />} />
+          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+        </Routes>
+      </div>
       <Footer />
     </>
   );

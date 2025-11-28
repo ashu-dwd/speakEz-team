@@ -1,0 +1,144 @@
+.cta-section {
+  padding: 8rem 2rem;
+  background: linear-gradient(135deg, #086375 0%, #0a7e94 100%);
+  position: relative;
+  overflow: hidden;
+  color: white;
+  margin-top: 4rem;
+}
+
+.cta-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.cta-content {
+  max-width: 800px;
+}
+
+.cta-title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  background: linear-gradient(to right, #ffffff, #e0e0e0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cta-description {
+  font-size: 1.25rem;
+  margin-bottom: 3rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.cta-button {
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-button.primary {
+  background-color: #ffffff;
+  color: #086375;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  background-color: #f8f9fa;
+}
+
+.cta-button.secondary {
+  background-color: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.cta-button.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  transform: translateY(-3px);
+}
+
+/* Decorative Circles */
+.cta-visual {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.circle-1 {
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  left: -100px;
+}
+
+.circle-2 {
+  width: 500px;
+  height: 500px;
+  bottom: -200px;
+  right: -100px;
+}
+
+.circle-3 {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  right: 20%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cta-section {
+    padding: 6rem 1.5rem;
+  }
+
+  .cta-title {
+    font-size: 2.5rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cta-button {
+    width: 100%;
+  }
+}

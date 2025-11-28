@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const { setUser, login } = useContext(AuthContext);
   const navigate = useNavigate();
- 
+
   // Auto-fill remembered email and redirect if already logged in
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberEmail");
@@ -32,7 +33,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/user/login",
+        `${import.meta.env.VITE_SERVER_API_URL}/api/user/login`,
         {
           email,
           password,
@@ -53,10 +54,30 @@ const Login = () => {
           localStorage.removeItem("rememberEmail");
         }
 
-        alert(message || "Login successful!");
+        toast.success(message || "Login successful!",{
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "black",
+            color: "#fff",
+            borderRadius: "10px",
+            padding: "10px",
+            fontSize: "16px",
+          },
+        });
         navigate("/dashboard");
       } else {
-        alert("Login failed. Please try again.");
+        toast.error(message || "Login failed. Please try again.",{
+          duration: 3000,
+          position: "top-center",
+          style: {
+            background: "white",
+            color: "black",
+            borderRadius: "10px",
+            padding: "10px",
+            fontSize: "16px",
+          },
+        });
       }
     } catch (error) {
       const errMsg =
@@ -67,8 +88,8 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
+    <div className="login-container d-flex align-items-center justify-content-center">
+      <form onSubmit={handleSubmit} className="login-form mt-20">
         <h2>Login</h2>
 
         <input

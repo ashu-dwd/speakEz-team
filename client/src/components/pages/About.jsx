@@ -1,7 +1,9 @@
 import React from "react";
 import "./About.css";
+import { Link , useNavigate } from "react-router-dom";
 
 const About = () => {
+  const navigate = useNavigate();
   return (
     <div className="about-container">
       <div className="about-card">
@@ -20,7 +22,7 @@ const About = () => {
           <li>📚 Engaging content from beginner to advanced</li>
           <li>🏆 Progress tracking & achievement badges</li>
         </ul>
-        <button className="about-button">Start Learning Now</button>
+        <button className="about-button" onClick={() => navigate('/signup')}>Start Learning Now</button>
       </div>
 
       <div className="stats-section">
@@ -51,6 +53,3 @@ const About = () => {
 };
 
 export default About;
-
-
-

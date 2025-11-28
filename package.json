@@ -1,0 +1,21 @@
+{
+  "name": "speakEz-team",
+  "version": "1.0.0",
+  "description": "SpeakEz Team Project - Fullstack Application",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter server run dev\" \"pnpm --filter client run dev\"",
+    "dev:server": "pnpm --filter server run dev",
+    "dev:client": "pnpm --filter client run dev",
+    "start": "pnpm --filter server run start",
+    "install:all": "pnpm install && pnpm --filter server install && pnpm --filter client install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.23.0",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

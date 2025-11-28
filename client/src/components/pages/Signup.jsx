@@ -5,6 +5,7 @@ import { auth } from "../../Firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ const Signup = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
+        toast.success("Signed up successfully!");
         navigate("/dashboard");
       })
       .catch((err) => {
@@ -61,7 +63,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="signup-container">
+    <div className="signup-container mt-20">
       <form onSubmit={handleSubmit} className="signup-form">
         <h2>Sign Up</h2>
 
