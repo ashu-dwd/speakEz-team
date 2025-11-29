@@ -1,12 +1,41 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { FaUserPlus, FaSignInAlt, FaGavel, FaHome } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaUserPlus, FaSignInAlt, FaGavel, FaHome, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
 
 /**
  * Navbar: Responsive, animated navigation for main pages (Home, Features, How It Works, Pricing, Terms, Login, Signup).
  * Uses react-router-dom Link and icons for clarity. Mobile menu included.
  */
+import axiosInstance from "../../utils/axios";
+
+// ... (imports remain the same)
+
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check for auth token in local or session storage
+    const auth = localStorage.getItem("auth") || sessionStorage.getItem("auth");
+    if (auth) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post("/user/logout");
+    } catch (error) {
+      console.error("Logout failed on server", error);
+    } finally {
+      // Always clear local state even if server fails
+      localStorage.removeItem("auth");
+      sessionStorage.removeItem("auth");
+      setIsLoggedIn(false);
+      navigate("/");
+    }
+  };
+
   return (
     <div className="navbar bg-base-100 shadow-lg sticky top-0 z-10">
       {/* Left: Brand and Mobile Menu */}
@@ -65,16 +94,33 @@ const Navbar = () => {
                 <FaGavel /> Terms of Service
               </Link>
             </li>
-            <li>
-              <Link to="/signup" className="flex items-center gap-2 text-base">
-                <FaUserPlus /> Sign Up
-              </Link>
-            </li>
-            <li>
-              <Link to="/login" className="flex items-center gap-2 text-base">
-                <FaSignInAlt /> Login
-              </Link>
-            </li>
+            {isLoggedIn ? (
+              <>
+                <li>
+                  <Link to="/dashboard" className="flex items-center gap-2 text-base">
+                    <FaTachometerAlt /> Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className="flex items-center gap-2 text-base text-error">
+                    <FaSignOutAlt /> Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link to="/signup" className="flex items-center gap-2 text-base">
+                    <FaUserPlus /> Sign Up
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/login" className="flex items-center gap-2 text-base">
+                    <FaSignInAlt /> Login
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost text-xl font-bold gap-2">
@@ -107,20 +153,41 @@ const Navbar = () => {
       </div>
       {/* End: Auth buttons */}
       <div className="navbar-end flex gap-2">
-        <Link
-          to="/signup"
-          className="btn btn-primary flex items-center gap-2 hover:scale-105 transition-transform"
-          aria-label="Sign Up"
-        >
-          <FaUserPlus /> Sign Up
-        </Link>
-        <Link
-          to="/login"
-          className="btn btn-outline flex items-center gap-2 hover:scale-105 transition-transform"
-          aria-label="Login"
-        >
-          <FaSignInAlt /> Login
-        </Link>
+        {isLoggedIn ? (
+          <>
+            <Link
+              to="/dashboard"
+              className="btn btn-primary flex items-center gap-2 hover:scale-105 transition-transform"
+              aria-label="Dashboard"
+            >
+              <FaTachometerAlt /> Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline btn-error flex items-center gap-2 hover:scale-105 transition-transform"
+              aria-label="Logout"
+            >
+              <FaSignOutAlt /> Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              to="/signup"
+              className="btn btn-primary flex items-center gap-2 hover:scale-105 transition-transform"
+              aria-label="Sign Up"
+            >
+              <FaUserPlus /> Sign Up
+            </Link>
+            <Link
+              to="/login"
+              className="btn btn-outline flex items-center gap-2 hover:scale-105 transition-transform"
+              aria-label="Login"
+            >
+              <FaSignInAlt /> Login
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

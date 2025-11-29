@@ -65,26 +65,65 @@ const handleUserSignin = async (req, res) => {
     user.lastLogin = new Date();
     user.loginCount += 1;
     user.activityLog.push({ action: "login" });
-    await user.save();
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "15m" }
     );
 
-    // Exclude password from response
+    const refreshToken = jwt.sign(
+      { userId: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Exclude password and refresh token from response
     const userResponse = user.toObject();
     delete userResponse.password;
+    delete userResponse.refreshToken;
 
     return res.status(200).json({
       success: true,
-      token,
+      accessToken,
+      refreshToken,
       user: userResponse,
       message: "User signed in successfully",
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+const handleRefreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(401).json({ error: "Refresh Token is required" });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({ error: "Invalid Refresh Token" });
+    }
+
+    const accessToken = jwt.sign(
+      { userId: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    return res.status(200).json({
+      success: true,
+      accessToken,
+    });
+  } catch (error) {
+    return res.status(403).json({ error: "Invalid Refresh Token" });
   }
 };
 
@@ -257,6 +296,22 @@ const handleResetPassword = async (req, res) => {
   }
 };
 
+const handleUserLogout = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    user.activityLog.push({ action: "logout" });
+    user.refreshToken = null; // Clear refresh token
+    await user.save();
+    return res.status(200).json({ message: "Logged out successfully", success: true });
+  } catch (error) {
+    return res.status(500).json({ error: "Server error during logout" });
+  }
+};
+
 export {
   handleUserSignup,
   handleUserSignin,
@@ -265,4 +320,6 @@ export {
   handleForgotPassword,
   handleVerifyResetToken,
   handleResetPassword,
+  handleUserLogout,
+  handleRefreshToken,
 };

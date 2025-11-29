@@ -76,12 +76,13 @@ const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      if (res.data && res.data.success && res.data.token) {
+      if (res.data && res.data.success && res.data.accessToken) {
         setApiMessage("Login successful!");
         // Store auth details for later use in the app
         storeAuth(
           {
-            token: res.data.token,
+            accessToken: res.data.accessToken,
+            refreshToken: res.data.refreshToken,
             user: res.data.user || null,
             loginAt: Date.now(),
           },
