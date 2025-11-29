@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import BlogList from "./pages/blogs/BlogList";
 import BlogPost from "./pages/blogs/BlogPost";
+import Dashboard from "./pages/Dashboard";
 
 /**
  * Route definitions for modular app routing.
@@ -50,6 +51,11 @@ const ROUTES = [
   {
     path: "/blogs/:slug",
     component: BlogPost,
+    layout: true,
+  },
+  {
+    path: "/dashboard",
+    component: Dashboard,
     layout: true,
   },
   // 404 fallback - keep last

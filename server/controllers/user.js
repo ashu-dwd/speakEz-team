@@ -15,8 +15,6 @@ import {
 } from "../validations.js";
 configDotenv();
 
-
-
 const handleUserSignup = async (email, password, name) => {
   if (!email || !password || !name) {
     throw new Error("Please fill all the fields");
@@ -59,12 +57,14 @@ const handleUserSignin = async (req, res) => {
     // console.log(user);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
     }
     // Update user tracking
     user.lastLogin = new Date();
     user.loginCount += 1;
-    user.activityLog.push({ action: 'login' });
+    user.activityLog.push({ action: "login" });
     await user.save();
 
     const token = jwt.sign(
@@ -78,10 +78,10 @@ const handleUserSignin = async (req, res) => {
     delete userResponse.password;
 
     return res.status(200).json({
-      data: token,
+      success: true,
+      token,
       user: userResponse,
       message: "User signed in successfully",
-      success: true,
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -90,7 +90,9 @@ const handleUserSignin = async (req, res) => {
 
 const handleOtpVerification = async (req, res) => {
   try {
-    const { email, otp, password, name } = otpVerificationSchema.parse(req.body);
+    const { email, otp, password, name } = otpVerificationSchema.parse(
+      req.body
+    );
   } catch (error) {
     return res.status(400).json({ error: error.errors[0].message });
   }
@@ -99,7 +101,7 @@ const handleOtpVerification = async (req, res) => {
   try {
     const user = await Otp.findOne({ email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ success: false, error: "User not found" });
     }
     // console.log(user);
 
@@ -155,7 +157,7 @@ const handleOtpGeneration = async (req, res) => {
       .status(200)
       .json({ message: "OTP sent successfully", success: true });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -176,11 +178,24 @@ const handleForgotPassword = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "15m" } // short expiry
     );
-    const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password/${token}`;
-    const passResetData = await PassReset.create({ email, token, resetLink, emailSent: true });
-    await emailSender(email, "Password Reset", `Click here to reset: ${resetLink}`);
+    const resetLink = `${
+      process.env.CLIENT_URL || "http://localhost:5173"
+    }/reset-password/${token}`;
+    const passResetData = await PassReset.create({
+      email,
+      token,
+      resetLink,
+      emailSent: true,
+    });
+    await emailSender(
+      email,
+      "Password Reset",
+      `Click here to reset: ${resetLink}`
+    );
 
-    res.status(200).json({ message: "Reset link sent successfully", success: true });
+    res
+      .status(200)
+      .json({ message: "Reset link sent successfully", success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -196,7 +211,7 @@ const handleVerifyResetToken = async (req, res) => {
 
   try {
     const tokenData = await PassReset.findOne({
-      token
+      token,
     });
 
     if (!tokenData) {
@@ -212,7 +227,10 @@ const handleVerifyResetToken = async (req, res) => {
 const handleResetPassword = async (req, res) => {
   try {
     const { token } = req.params;
-    const { newPassword } = resetPasswordSchema.parse({ token, newPassword: req.body.newPassword });
+    const { newPassword } = resetPasswordSchema.parse({
+      token,
+      newPassword: req.body.newPassword,
+    });
   } catch (error) {
     return res.status(400).json({ error: error.errors[0].message });
   }
@@ -222,15 +240,18 @@ const handleResetPassword = async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({
-      _id: decoded.userId
+      _id: decoded.userId,
     });
 
-    if (!user) return res.status(400).json({ error: "Invalid or expired token" });
+    if (!user)
+      return res.status(400).json({ error: "Invalid or expired token" });
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    return res.status(200).json({ message: "Password reset successful", success: true });
+    return res
+      .status(200)
+      .json({ message: "Password reset successful", success: true });
   } catch (err) {
     return res.status(400).json({ error: "Invalid or expired token" });
   }
