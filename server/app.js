@@ -4,6 +4,9 @@ import cors from "cors";
 import userDataRoute from "./routes/user-data-route.js";
 import chatRoute from "./routes/chat-route.js";
 import aiCharRoute from "./routes/ai-char-route.js";
+import sessionRoute from "./routes/session-route.js";
+import statsRoute from "./routes/stats-route.js";
+import settingsRoute from "./routes/settings-route.js";
 import connectDB from "./connect.js";
 import verifyToken from "./middlewares/auth.js";
 
@@ -20,11 +23,17 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Serve static files for uploads
+app.use('/uploads', express.static('uploads'));
+
 //middleware for routes
 app.use("/api/user", userRoute);
 app.use("/api/userData", verifyToken, userDataRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/aiChar", verifyToken, aiCharRoute);
+app.use("/api/session", sessionRoute);
+app.use("/api/stats", statsRoute);
+app.use("/api/settings", settingsRoute);
 
 
 if (process.env.NODE_ENV !== 'test') {

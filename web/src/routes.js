@@ -7,6 +7,7 @@ import Signup from "./pages/Signup";
 import BlogList from "./pages/blogs/BlogList";
 import BlogPost from "./pages/blogs/BlogPost";
 import Dashboard from "./pages/Dashboard";
+import Settings from "./pages/Settings";
 
 /**
  * Route definitions for modular app routing.
@@ -56,6 +57,11 @@ const ROUTES = [
   {
     path: "/dashboard",
     component: Dashboard,
+    layout: true,
+  },
+  {
+    path: "/settings",
+    component: Settings,
     layout: true,
   },
   // 404 fallback - keep last

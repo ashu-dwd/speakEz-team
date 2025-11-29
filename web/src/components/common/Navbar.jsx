@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserPlus, FaSignInAlt, FaGavel, FaHome, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
-
-/**
- * Navbar: Responsive, animated navigation for main pages (Home, Features, How It Works, Pricing, Terms, Login, Signup).
- * Uses react-router-dom Link and icons for clarity. Mobile menu included.
- */
+import { FaUserPlus, FaSignInAlt, FaGavel, FaHome, FaSignOutAlt, FaTachometerAlt, FaCog } from "react-icons/fa";
 import axiosInstance from "../../utils/axios";
 
 // ... (imports remain the same)
@@ -102,6 +97,11 @@ const Navbar = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/settings" className="flex items-center gap-2 text-base">
+                    <FaCog /> Settings
+                  </Link>
+                </li>
+                <li>
                   <button onClick={handleLogout} className="flex items-center gap-2 text-base text-error">
                     <FaSignOutAlt /> Logout
                   </button>
@@ -161,6 +161,13 @@ const Navbar = () => {
               aria-label="Dashboard"
             >
               <FaTachometerAlt /> Dashboard
+            </Link>
+            <Link
+              to="/settings"
+              className="btn btn-ghost flex items-center gap-2 hover:scale-105 transition-transform"
+              aria-label="Settings"
+            >
+              <FaCog />
             </Link>
             <button
               onClick={handleLogout}

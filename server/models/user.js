@@ -39,6 +39,16 @@ const userSchema = new mongoose.Schema({
     refreshToken: {
         type: String,
     },
+    profilePicture: {
+        type: String,
+    },
+    bio: {
+        type: String,
+        maxlength: 500,
+    },
+    phone: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });
