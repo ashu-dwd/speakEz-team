@@ -1,11 +1,11 @@
 import express from "express";
-import userRoute from "./Routes/userRoute.js";
+import userRoute from "./routes/user-route.js";
 import cors from "cors";
-import userDataRoute from "./Routes/userDataRoute.js";
-import chatRoute from "./Routes/chatRoute.js";
-import aiCharRoute from "./Routes/aiCharRoute.js";
+import userDataRoute from "./routes/user-data-route.js";
+import chatRoute from "./routes/chat-route.js";
+import aiCharRoute from "./routes/ai-char-route.js";
 import connectDB from "./connect.js";
-import verifyToken from "./Middlewares/auth.js";
+import verifyToken from "./middlewares/auth.js";
 
 const app = express();
 

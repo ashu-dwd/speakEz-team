@@ -18,7 +18,24 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-    }
+    },
+    lastLogin: {
+        type: Date,
+    },
+    loginCount: {
+        type: Number,
+        default: 0,
+    },
+    activityLog: [{
+        action: {
+            type: String,
+            required: true,
+        },
+        timestamp: {
+            type: Date,
+            default: Date.now,
+        },
+    }],
 }, {
     timestamps: true,
 });

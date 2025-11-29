@@ -5,7 +5,7 @@ import { jest } from "@jest/globals";
 let mongoServer;
 
 // Mock emailSender to avoid actual email sending
-jest.unstable_mockModule("../controllers/emailSender.js", () => ({
+jest.unstable_mockModule("../controllers/email-sender.js", () => ({
   default: jest.fn().mockResolvedValue(true),
 }));
 

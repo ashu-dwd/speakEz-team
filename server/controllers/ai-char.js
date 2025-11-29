@@ -1,15 +1,11 @@
 import { nanoid } from "nanoid";
 import aiChar from "../models/aiChar.js";
+import { generateCharacterSchema } from "../validations.js";
 
 const generateCharacter = async (req, res) => {
     try {
-        const { name, description, personality } = req.body;
+        const { name, description, personality } = generateCharacterSchema.parse(req.body);
         const image = req.file?.filename || "image.jpg";
-
-        // Validation
-        if (!name || !description || !personality || !image) {
-            return res.status(400).json({ error: "Please fill all the fields" });
-        }
 
         const charId = nanoid(8);
         // console.log(req.user)

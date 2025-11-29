@@ -15,6 +15,18 @@ const roomSchema = new mongoose.Schema({
         ref: 'Character',
         required: true
     },
+    lastActivity: {
+        type: Date,
+        default: Date.now,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    messageCount: {
+        type: Number,
+        default: 0,
+    },
 }, {
     timestamps: true
 })
