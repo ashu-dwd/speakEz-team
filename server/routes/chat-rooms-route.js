@@ -1,17 +1,17 @@
 import express from "express";
 import ChatRoom from "../models/chatRoom.js";
 import ChatMessage from "../models/chatMessage.js";
-import { authenticateToken } from "../middlewares/auth.js";
+import verifyToken from "../middlewares/auth.js";
 
 const Router = express.Router();
 
 // Apply authentication to all chat routes
-Router.use(authenticateToken);
+Router.use(verifyToken);
 
 // Get all rooms (public rooms + user's private rooms)
 Router.get("/rooms", async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     // Get public rooms and rooms where user is a participant
     const rooms = await ChatRoom.find({
@@ -57,7 +57,7 @@ Router.post("/rooms", async (req, res) => {
       isPublic = true,
       maxParticipants = 50,
     } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     if (!name || name.trim().length === 0) {
       return res.status(400).json({
@@ -117,7 +117,7 @@ Router.post("/rooms", async (req, res) => {
 Router.get("/rooms/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const room = await ChatRoom.findOne({
       _id: roomId,
@@ -165,7 +165,7 @@ Router.put("/rooms/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
     const { name, description, maxParticipants } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const room = await ChatRoom.findOne({
       _id: roomId,
@@ -234,7 +234,7 @@ Router.put("/rooms/:roomId", async (req, res) => {
 Router.delete("/rooms/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const room = await ChatRoom.findOneAndUpdate(
       {
@@ -270,7 +270,7 @@ Router.delete("/rooms/:roomId", async (req, res) => {
 Router.post("/rooms/:roomId/join", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const room = await ChatRoom.findOne({
       _id: roomId,
@@ -325,7 +325,7 @@ Router.post("/rooms/:roomId/join", async (req, res) => {
 Router.post("/rooms/:roomId/leave", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const room = await ChatRoom.findOne({
       _id: roomId,
@@ -382,7 +382,7 @@ Router.post("/rooms/:roomId/leave", async (req, res) => {
 Router.get("/rooms/:roomId/messages", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { limit = 50, before } = req.query;
 
     // Check if user has access to the room

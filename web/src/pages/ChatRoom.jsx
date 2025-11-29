@@ -22,8 +22,10 @@ const ChatRoom = () => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [showRoomSettings, setShowRoomSettings] = useState(false);
+  const [typingUsers, setTypingUsers] = useState(new Set());
   const messagesEndRef = useRef(null);
   const messageInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   // Get user info from localStorage (assuming it's stored there)
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -47,7 +49,7 @@ const ChatRoom = () => {
 
   const initializeSocket = () => {
     const newSocket = io(
-      process.env.REACT_APP_API_URL || "http://localhost:3000"
+      import.meta.env.VITE_APP_API_URL || "http://localhost:3000"
     );
 
     newSocket.on("connect", () => {
@@ -95,6 +97,18 @@ const ChatRoom = () => {
       setError(error.message);
     });
 
+    newSocket.on("user-typing", (data) => {
+      setTypingUsers((prev) => {
+        const newSet = new Set(prev);
+        if (data.isTyping) {
+          newSet.add(data.userId);
+        } else {
+          newSet.delete(data.userId);
+        }
+        return newSet;
+      });
+    });
+
     setSocket(newSocket);
   };
 
@@ -125,9 +139,42 @@ const ChatRoom = () => {
     e.preventDefault();
     if (!newMessage.trim() || !socket || !isConnected) return;
 
+    // Stop typing indicator
+    if (socket) {
+      socket.emit("stop-typing");
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
     socket.emit("send-chat-message", { content: newMessage.trim() });
     setNewMessage("");
     messageInputRef.current?.focus();
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setNewMessage(value);
+
+    if (!socket || !isConnected) return;
+
+    // Start typing indicator
+    if (value.trim() && !typingTimeoutRef.current) {
+      socket.emit("start-typing");
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set timeout to stop typing indicator
+    typingTimeoutRef.current = setTimeout(() => {
+      if (socket) {
+        socket.emit("stop-typing");
+      }
+      typingTimeoutRef.current = null;
+    }, 1000);
   };
 
   const handleLeaveRoom = async () => {
@@ -420,6 +467,28 @@ const ChatRoom = () => {
           </div>
         </div>
 
+        {/* Typing Indicator */}
+        {typingUsers.size > 0 && (
+          <div className="bg-white border-t border-gray-200 px-4 py-2">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-sm text-gray-500 italic">
+                {Array.from(typingUsers).filter((id) => id !== user.id).length >
+                0
+                  ? `${
+                      Array.from(typingUsers).filter((id) => id !== user.id)
+                        .length
+                    } user${
+                      Array.from(typingUsers).filter((id) => id !== user.id)
+                        .length > 1
+                        ? "s are"
+                        : " is"
+                    } typing...`
+                  : "Someone is typing..."}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Message Input */}
         <div className="bg-white border-t border-gray-200 px-4 py-3">
           <div className="max-w-4xl mx-auto">
@@ -428,7 +497,7 @@ const ChatRoom = () => {
                 ref={messageInputRef}
                 type="text"
                 value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
+                onChange={handleInputChange}
                 placeholder={
                   isConnected ? "Type a message..." : "Connecting..."
                 }

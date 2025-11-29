@@ -464,6 +464,41 @@ export const setupSocketHandlers = (io) => {
       }
     });
 
+    // Typing indicators
+    socket.on("start-typing", async (data) => {
+      try {
+        const roomId = socket.chatRoomId;
+        const userId = socket.userId;
+
+        if (!roomId || !userId) return;
+
+        // Broadcast typing start to other participants
+        socket.to(`chat-room-${roomId}`).emit("user-typing", {
+          userId,
+          isTyping: true,
+        });
+      } catch (error) {
+        console.error("Error handling typing start:", error);
+      }
+    });
+
+    socket.on("stop-typing", async (data) => {
+      try {
+        const roomId = socket.chatRoomId;
+        const userId = socket.userId;
+
+        if (!roomId || !userId) return;
+
+        // Broadcast typing stop to other participants
+        socket.to(`chat-room-${roomId}`).emit("user-typing", {
+          userId,
+          isTyping: false,
+        });
+      } catch (error) {
+        console.error("Error handling typing stop:", error);
+      }
+    });
+
     // Handle disconnect
     socket.on("disconnect", async () => {
       console.log(`User disconnected: ${socket.id}`);

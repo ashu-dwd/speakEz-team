@@ -16,7 +16,7 @@ const generateChatRoomId = async (req, res) => {
   await Room.create({
     roomId: roomId,
     charId: charId,
-    userId: req.user ? req.user.id : "680741a975fa6ff05775336a",
+    userId: req.user ? req.user.userId : "680741a975fa6ff05775336a",
   });
   return res.status(200).json({ roomId: roomId, success: true });
 };
@@ -39,7 +39,7 @@ const handleUserConvo = async (req, res) => {
     { roomId },
     {
       $inc: { messageCount: 1 },
-      $set: { lastActivity: new Date() }
+      $set: { lastActivity: new Date() },
     }
   );
 
