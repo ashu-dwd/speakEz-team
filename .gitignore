@@ -3,3 +3,4 @@ node_modules
 #dont push images starting with aiCharImg
 aiCharImg*
 uploads/*
+memory-bank

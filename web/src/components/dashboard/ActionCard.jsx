@@ -1,28 +1,40 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaMicrophone, FaVideo, FaComments } from "react-icons/fa";
 
 /**
  * ActionCard - Primary CTA for starting a new practice session
  */
 const ActionCard = () => {
+  const navigate = useNavigate();
+
   const practiceTypes = [
-    { 
-      icon: FaMicrophone, 
-      label: "Interview Prep", 
+    {
+      icon: FaMicrophone,
+      label: "Interview Prep",
       description: "Practice common interview questions",
-      color: "primary" 
+      color: "primary",
+      action: () => {
+        // TODO: Navigate to interview prep (existing AI chat)
+        console.log("Interview Prep - navigate to existing AI chat");
+      },
     },
-    { 
-      icon: FaVideo, 
-      label: "Public Speaking", 
-      description: "Improve presentation skills",
-      color: "secondary" 
+    {
+      icon: FaVideo,
+      label: "Public Speaking",
+      description: "Practice with another person",
+      color: "secondary",
+      action: () => navigate("/call"),
     },
-    { 
-      icon: FaComments, 
-      label: "Casual Chat", 
+    {
+      icon: FaComments,
+      label: "Casual Chat",
       description: "Build conversational confidence",
-      color: "accent" 
+      color: "accent",
+      action: () => {
+        // TODO: Navigate to casual chat (existing AI chat)
+        console.log("Casual Chat - navigate to existing AI chat");
+      },
     },
   ];
 
@@ -36,6 +48,7 @@ const ActionCard = () => {
           {practiceTypes.map((type, idx) => (
             <button
               key={idx}
+              onClick={type.action}
               className="btn btn-outline hover:scale-105 transition-transform duration-200 flex-col h-auto py-4 gap-2"
             >
               <type.icon className={`text-3xl text-${type.color}`} />

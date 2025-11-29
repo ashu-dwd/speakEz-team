@@ -8,6 +8,7 @@ import BlogList from "./pages/blogs/BlogList";
 import BlogPost from "./pages/blogs/BlogPost";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import Call from "./pages/Call";
 
 /**
  * Route definitions for modular app routing.
@@ -63,6 +64,11 @@ const ROUTES = [
     path: "/settings",
     component: Settings,
     layout: true,
+  },
+  {
+    path: "/call",
+    component: Call,
+    layout: false, // No navbar/layout for call interface
   },
   // 404 fallback - keep last
   {
