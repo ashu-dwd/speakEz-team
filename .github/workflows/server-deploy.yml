@@ -1,0 +1,332 @@
+name: Server CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "server/**"
+      - ".github/workflows/server-deploy.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "server/**"
+
+env:
+  NODE_VERSION: "18"
+  MONGODB_VERSION: "7.0"
+
+jobs:
+  test:
+    name: Test Server
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+
+    services:
+      mongodb:
+        image: mongo:${{ env.MONGODB_VERSION }}
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+          cache-dependency-path: server/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm run lint || true
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          NODE_ENV: test
+          MONGO_URI: mongodb://localhost:27017/speakez_test
+          JWT_SECRET: test_jwt_secret_for_ci_cd_pipeline
+
+      - name: Generate coverage report
+        run: pnpm run test:coverage || true
+
+  build:
+    name: Build Server
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+          cache-dependency-path: server/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: ./server
+        run: pnpm install --frozen-lockfile --prod
+
+      - name: Build application
+        working-directory: ./server
+        run: pnpm run build || echo "No build script found"
+
+      - name: Run security audit
+        working-directory: ./server
+        run: pnpm audit --audit-level moderate || true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-build
+          path: |
+            server/
+            !server/node_modules/
+            !server/.git/
+            !server/__tests__/
+            !server/**/*.test.js
+            !server/**/*.spec.js
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: server-build
+          path: server/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install production dependencies
+        working-directory: ./server
+        run: npm ci --only=production
+
+      - name: Create deployment package
+        run: |
+          tar -czf server-staging.tar.gz server/
+          echo "Deployment package created"
+
+      - name: Deploy to staging server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT }}
+          script: |
+            # Create backup of current deployment
+            if [ -d "/opt/speakez/server" ]; then
+              sudo cp -r /opt/speakez/server /opt/speakez/server.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+
+            # Stop current application
+            sudo systemctl stop speakez-server || true
+
+            # Remove old deployment
+            sudo rm -rf /opt/speakez/server
+
+            # Create deployment directory
+            sudo mkdir -p /opt/speakez/server
+
+      - name: Upload deployment package
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT }}
+          source: "server-staging.tar.gz"
+          target: "/tmp/"
+
+      - name: Complete staging deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT }}
+          script: |
+            # Extract deployment package
+            sudo tar -xzf /tmp/server-staging.tar.gz -C /opt/speakez/
+
+            # Install dependencies
+            cd /opt/speakez/server
+            sudo npm ci --only=production
+
+            # Run database migrations if needed
+            # sudo npm run migrate || true
+
+            # Set proper permissions
+            sudo chown -R www-data:www-data /opt/speakez/server
+            sudo chmod -R 755 /opt/speakez/server
+
+            # Restart application
+            sudo systemctl daemon-reload
+            sudo systemctl start speakez-server
+
+            # Wait for application to start
+            sleep 10
+
+            # Health check
+            curl -f http://localhost:5000/health || exit 1
+
+            # Clean up old backups (keep last 5)
+            cd /opt/speakez
+            ls -t server.backup.* | tail -n +6 | xargs -r sudo rm -rf
+
+      - name: Notify deployment status
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: "#deployments"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: server-build
+          path: server/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install production dependencies
+        working-directory: ./server
+        run: npm ci --only=production
+
+      - name: Create deployment package
+        run: |
+          tar -czf server-production.tar.gz server/
+          echo "Production deployment package created"
+
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          script: |
+            # Create backup of current deployment
+            if [ -d "/opt/speakez/server" ]; then
+              sudo cp -r /opt/speakez/server /opt/speakez/server.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+
+            # Stop current application
+            sudo systemctl stop speakez-server || true
+
+            # Remove old deployment
+            sudo rm -rf /opt/speakez/server
+
+            # Create deployment directory
+            sudo mkdir -p /opt/speakez/server
+
+      - name: Upload deployment package
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          source: "server-production.tar.gz"
+          target: "/tmp/"
+
+      - name: Complete production deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          script: |
+            # Extract deployment package
+            sudo tar -xzf /tmp/server-production.tar.gz -C /opt/speakez/
+
+            # Install dependencies
+            cd /opt/speakez/server
+            sudo npm ci --only=production
+
+            # Run database migrations if needed
+            # sudo npm run migrate || true
+
+            # Set proper permissions
+            sudo chown -R www-data:www-data /opt/speakez/server
+            sudo chmod -R 755 /opt/speakez/server
+
+            # Restart application
+            sudo systemctl daemon-reload
+            sudo systemctl start speakez-server
+
+            # Wait for application to start
+            sleep 15
+
+            # Health check
+            curl -f https://api.speakez.com/health || exit 1
+
+            # Clean up old backups (keep last 10)
+            cd /opt/speakez
+            ls -t server.backup.* | tail -n +11 | xargs -r sudo rm -rf
+
+      - name: Notify deployment status
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: "#deployments"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure() && (needs.deploy-staging.result == 'failure' || needs.deploy-production.result == 'failure')
+
+    steps:
+      - name: Notify rollback needed
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: "#alerts"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          text: "🚨 Deployment failed! Manual rollback may be needed."

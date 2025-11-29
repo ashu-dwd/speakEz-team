@@ -35,6 +35,10 @@
   --noise: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

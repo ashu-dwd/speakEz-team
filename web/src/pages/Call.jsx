@@ -16,7 +16,7 @@ const Call = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [socket, setSocket] = useState(null);
-  const [callState, setCallState] = useState("connecting"); // connecting, waiting, matched, active, ended
+  const [callState, setCallState] = useState("setup"); // setup, connecting, waiting, matched, active, ended
   const [peerConnection, setPeerConnection] = useState(null);
   const [stream, setStream] = useState(null);
   const [partnerStream, setPartnerStream] = useState(null);
@@ -25,11 +25,107 @@ const Call = () => {
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [queuePosition, setQueuePosition] = useState(0);
   const [error, setError] = useState(null);
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [mediaSettings, setMediaSettings] = useState({
+    audioEnabled: true,
+    videoEnabled: true,
+    audioDevice: null,
+    videoDevice: null,
+  });
+  const [availableDevices, setAvailableDevices] = useState({
+    audioInputs: [],
+    videoInputs: [],
+  });
 
   const myVideoRef = useRef();
   const partnerVideoRef = useRef();
+  const testVideoRef = useRef();
 
-  // Get current user
+  // Get available media devices
+  const getAvailableDevices = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(
+        (device) => device.kind === "audioinput"
+      );
+      const videoInputs = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
+
+      setAvailableDevices({
+        audioInputs,
+        videoInputs,
+      });
+
+      // Set default devices if not already set
+      if (!mediaSettings.audioDevice && audioInputs.length > 0) {
+        setMediaSettings((prev) => ({
+          ...prev,
+          audioDevice: audioInputs[0].deviceId,
+        }));
+      }
+      if (!mediaSettings.videoDevice && videoInputs.length > 0) {
+        setMediaSettings((prev) => ({
+          ...prev,
+          videoDevice: videoInputs[0].deviceId,
+        }));
+      }
+    } catch (err) {
+      console.error("Error getting devices:", err);
+    }
+  };
+
+  // Test media access
+  const testMediaAccess = async () => {
+    try {
+      const testStream = await navigator.mediaDevices.getUserMedia({
+        video: mediaSettings.videoEnabled
+          ? { deviceId: mediaSettings.videoDevice }
+          : false,
+        audio: mediaSettings.audioEnabled
+          ? { deviceId: mediaSettings.audioDevice }
+          : false,
+      });
+
+      if (testVideoRef.current) {
+        testVideoRef.current.srcObject = testStream;
+      }
+
+      // Stop test stream after 3 seconds
+      setTimeout(() => {
+        testStream.getTracks().forEach((track) => track.stop());
+        if (testVideoRef.current) {
+          testVideoRef.current.srcObject = null;
+        }
+      }, 3000);
+
+      setError(null);
+    } catch (err) {
+      console.error("Media access error:", err);
+      if (err.name === "NotAllowedError") {
+        setError(
+          "Camera/microphone access denied. Please allow permissions and try again."
+        );
+      } else if (err.name === "NotFoundError") {
+        setError(
+          "No camera/microphone found. Please connect a device and try again."
+        );
+      } else {
+        setError(
+          "Failed to access camera/microphone. Please check your settings."
+        );
+      }
+    }
+  };
+
+  // Start the call process
+  const startCallProcess = () => {
+    console.log("Starting call process...");
+    setCallState("connecting");
+    // Socket connection will be established in useEffect
+  };
+
+  // Get current user and initialize devices
   useEffect(() => {
     const getCurrentUser = () => {
       try {
@@ -51,39 +147,68 @@ const Call = () => {
     const currentUser = getCurrentUser();
     if (currentUser) {
       setUser(currentUser);
+      // Get available devices when user is loaded
+      getAvailableDevices();
     }
   }, [navigate]);
 
-  // Initialize socket connection
+  // Initialize socket connection only after user starts the call process
   useEffect(() => {
-    if (!user) return;
+    if (callState !== "connecting" || !user) return;
 
+    console.log("Attempting to connect to socket server...");
     const socketConnection = io(
       import.meta.env.VITE_APP_API_URL || "http://localhost:5000"
     );
     setSocket(socketConnection);
 
-    // Join queue when connected
+    // Connection events
     socketConnection.on("connect", () => {
+      console.log("Socket connected, joining queue...");
       socketConnection.emit("join-queue", { userId: user._id });
       setCallState("waiting");
     });
 
+    socketConnection.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+      setError("Failed to connect to server. Please check your connection.");
+      setCallState("setup");
+    });
+
+    socketConnection.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+      if (callState === "waiting") {
+        setError("Connection lost. Please try again.");
+        setCallState("setup");
+      }
+    });
+
     // Queue events
     socketConnection.on("queue-joined", (data) => {
+      console.log("Joined queue at position:", data.position);
       setQueuePosition(data.position);
       setCallState("waiting");
     });
 
     socketConnection.on("queue-error", (data) => {
+      console.error("Queue error:", data.message);
       setError(data.message);
-      setCallState("ended");
+      setCallState("setup");
     });
 
-    // Match found - initialize WebRTC
+    // Match found - initialize WebRTC or simulate in test mode
     socketConnection.on("match-found", async (data) => {
       setCallState("matched");
       setRoomId(data.roomId);
+
+      if (isTestMode) {
+        // Test mode: Skip WebRTC and go directly to active state
+        console.log("Test mode: Simulating call connection");
+        setTimeout(() => {
+          setCallState("active");
+        }, 2000); // Simulate connection delay
+        return;
+      }
 
       try {
         // Get user media
@@ -335,6 +460,156 @@ const Call = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-4">
+        {callState === "connecting" && (
+          <div className="text-center space-y-6">
+            <div className="animate-pulse">
+              <div className="w-32 h-32 bg-info rounded-full mx-auto flex items-center justify-center">
+                <span className="loading loading-spinner loading-lg text-info-content"></span>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-base-content mb-2">
+                Connecting...
+              </h2>
+              <p className="text-base-content/70">
+                Establishing connection to the server
+              </p>
+            </div>
+          </div>
+        )}
+
+        {callState === "setup" && (
+          <div className="w-full max-w-2xl space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-base-content mb-2">
+                Setup Your Call
+              </h2>
+              <p className="text-base-content/70">
+                Configure your camera and microphone before starting
+              </p>
+            </div>
+
+            {/* Media Settings */}
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h3 className="card-title">Media Settings</h3>
+
+                {/* Video Settings */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Camera</span>
+                  </label>
+                  <select
+                    className="select select-bordered"
+                    value={mediaSettings.videoDevice || ""}
+                    onChange={(e) =>
+                      setMediaSettings((prev) => ({
+                        ...prev,
+                        videoDevice: e.target.value,
+                      }))
+                    }
+                  >
+                    {availableDevices.videoInputs.map((device) => (
+                      <option key={device.deviceId} value={device.deviceId}>
+                        {device.label ||
+                          `Camera ${device.deviceId.slice(0, 8)}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Audio Settings */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Microphone</span>
+                  </label>
+                  <select
+                    className="select select-bordered"
+                    value={mediaSettings.audioDevice || ""}
+                    onChange={(e) =>
+                      setMediaSettings((prev) => ({
+                        ...prev,
+                        audioDevice: e.target.value,
+                      }))
+                    }
+                  >
+                    {availableDevices.audioInputs.map((device) => (
+                      <option key={device.deviceId} value={device.deviceId}>
+                        {device.label ||
+                          `Microphone ${device.deviceId.slice(0, 8)}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Test Video */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Test Your Camera</span>
+                  </label>
+                  <div className="relative bg-base-200 rounded-lg overflow-hidden">
+                    <video
+                      ref={testVideoRef}
+                      autoPlay
+                      muted
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <button
+                        onClick={testMediaAccess}
+                        className="btn btn-primary"
+                      >
+                        Test Camera & Mic
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Test Mode Toggle */}
+                <div className="form-control">
+                  <label className="label cursor-pointer">
+                    <span className="label-text">
+                      Test Mode (No Camera Required)
+                    </span>
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary"
+                      checked={isTestMode}
+                      onChange={(e) => setIsTestMode(e.target.checked)}
+                    />
+                  </label>
+                  <div className="text-xs text-base-content/60 mt-1">
+                    Enable to test matching without camera/microphone access
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="card-actions justify-between mt-4">
+                  <div className="text-sm text-base-content/60">
+                    {isTestMode
+                      ? "Test mode: No camera/microphone access required"
+                      : "Camera and microphone access will be requested when a partner is found"}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate("/dashboard")}
+                      className="btn btn-ghost"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={startCallProcess}
+                      className="btn btn-primary"
+                    >
+                      Start Finding Partner
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {callState === "waiting" && (
           <div className="text-center space-y-6">
             <div className="animate-pulse">

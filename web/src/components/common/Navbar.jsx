@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserPlus, FaSignInAlt, FaGavel, FaHome, FaSignOutAlt, FaTachometerAlt, FaCog } from "react-icons/fa";
+import {
+  FaUserPlus,
+  FaSignInAlt,
+  FaGavel,
+  FaHome,
+  FaSignOutAlt,
+  FaTachometerAlt,
+  FaCog,
+} from "react-icons/fa";
 import axiosInstance from "../../utils/axios";
 
 // ... (imports remain the same)
@@ -92,17 +100,26 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <li>
-                  <Link to="/dashboard" className="flex items-center gap-2 text-base">
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center gap-2 text-base"
+                  >
                     <FaTachometerAlt /> Dashboard
                   </Link>
                 </li>
                 <li>
-                  <Link to="/settings" className="flex items-center gap-2 text-base">
+                  <Link
+                    to="/settings"
+                    className="flex items-center gap-2 text-base"
+                  >
                     <FaCog /> Settings
                   </Link>
                 </li>
                 <li>
-                  <button onClick={handleLogout} className="flex items-center gap-2 text-base text-error">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-base text-error"
+                  >
                     <FaSignOutAlt /> Logout
                   </button>
                 </li>
@@ -110,12 +127,18 @@ const Navbar = () => {
             ) : (
               <>
                 <li>
-                  <Link to="/signup" className="flex items-center gap-2 text-base">
+                  <Link
+                    to="/signup"
+                    className="flex items-center gap-2 text-base"
+                  >
                     <FaUserPlus /> Sign Up
                   </Link>
                 </li>
                 <li>
-                  <Link to="/login" className="flex items-center gap-2 text-base">
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-2 text-base"
+                  >
                     <FaSignInAlt /> Login
                   </Link>
                 </li>
@@ -123,13 +146,16 @@ const Navbar = () => {
             )}
           </ul>
         </div>
-        <Link to="/" className="btn btn-ghost text-xl font-bold gap-2">
+        <Link
+          to="/"
+          className="btn btn-ghost text-lg sm:text-xl font-bold gap-1 sm:gap-2"
+        >
           🎤 SpeakEZ
         </Link>
       </div>
       {/* Center: Desktop Navigation */}
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1 text-base">
+        <ul className="menu menu-horizontal px-1 text-sm sm:text-base">
           <li>
             <Link to="/" className="flex items-center gap-1">
               <FaHome /> Home
@@ -152,46 +178,47 @@ const Navbar = () => {
         </ul>
       </div>
       {/* End: Auth buttons */}
-      <div className="navbar-end flex gap-2">
+      <div className="navbar-end flex-grow justify-end gap-1 sm:gap-2 pr-2 sm:pr-4 md:pr-6">
         {isLoggedIn ? (
           <>
             <Link
               to="/dashboard"
-              className="btn btn-primary flex items-center gap-2 hover:scale-105 transition-transform"
+              className="btn btn-primary btn-xs sm:btn-sm flex items-center gap-1 sm:gap-2 hover:scale-105 transition-transform min-h-[36px] sm:min-h-[40px] px-2 sm:px-3"
               aria-label="Dashboard"
             >
-              <FaTachometerAlt /> Dashboard
+              <FaTachometerAlt />{" "}
+              <span className="hidden sm:inline">Dashboard</span>
             </Link>
             <Link
               to="/settings"
-              className="btn btn-ghost flex items-center gap-2 hover:scale-105 transition-transform"
+              className="btn btn-ghost btn-xs sm:btn-sm flex items-center gap-1 sm:gap-2 hover:scale-105 transition-transform min-h-[36px] sm:min-h-[40px] px-2 sm:px-3"
               aria-label="Settings"
             >
-              <FaCog />
+              <FaCog /> <span className="hidden sm:inline">Settings</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="btn btn-outline btn-error flex items-center gap-2 hover:scale-105 transition-transform"
+              className="btn btn-outline btn-error btn-xs sm:btn-sm flex items-center gap-1 sm:gap-2 hover:scale-105 transition-transform min-h-[36px] sm:min-h-[40px] px-2 sm:px-3"
               aria-label="Logout"
             >
-              <FaSignOutAlt /> Logout
+              <FaSignOutAlt /> <span className="hidden sm:inline">Logout</span>
             </button>
           </>
         ) : (
           <>
             <Link
               to="/signup"
-              className="btn btn-primary flex items-center gap-2 hover:scale-105 transition-transform"
+              className="btn btn-primary btn-xs sm:btn-sm flex items-center gap-1 sm:gap-2 hover:scale-105 transition-transform min-h-[36px] sm:min-h-[40px] px-2 sm:px-3"
               aria-label="Sign Up"
             >
-              <FaUserPlus /> Sign Up
+              <FaUserPlus /> <span className="hidden sm:inline">Sign Up</span>
             </Link>
             <Link
               to="/login"
-              className="btn btn-outline flex items-center gap-2 hover:scale-105 transition-transform"
+              className="btn btn-outline btn-xs sm:btn-sm flex items-center gap-1 sm:gap-2 hover:scale-105 transition-transform min-h-[36px] sm:min-h-[40px] px-2 sm:px-3"
               aria-label="Login"
             >
-              <FaSignInAlt /> Login
+              <FaSignInAlt /> <span className="hidden sm:inline">Login</span>
             </Link>
           </>
         )}

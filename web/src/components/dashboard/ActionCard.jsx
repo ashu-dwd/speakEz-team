@@ -14,10 +14,7 @@ const ActionCard = () => {
       label: "Interview Prep",
       description: "Practice common interview questions",
       color: "primary",
-      action: () => {
-        // TODO: Navigate to interview prep (existing AI chat)
-        console.log("Interview Prep - navigate to existing AI chat");
-      },
+      action: () => navigate("/interview-setup"),
     },
     {
       icon: FaVideo,
@@ -29,12 +26,9 @@ const ActionCard = () => {
     {
       icon: FaComments,
       label: "Casual Chat",
-      description: "Build conversational confidence",
+      description: "Chat with other learners",
       color: "accent",
-      action: () => {
-        // TODO: Navigate to casual chat (existing AI chat)
-        console.log("Casual Chat - navigate to existing AI chat");
-      },
+      action: () => navigate("/chat-rooms"),
     },
   ];
 

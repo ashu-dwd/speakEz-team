@@ -9,6 +9,11 @@ import BlogPost from "./pages/blogs/BlogPost";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Call from "./pages/Call";
+import InterviewSetup from "./pages/InterviewSetup";
+import InterviewRoom from "./pages/InterviewRoom";
+import InterviewResults from "./pages/InterviewResults";
+import ChatRooms from "./pages/ChatRooms";
+import ChatRoom from "./pages/ChatRoom";
 
 /**
  * Route definitions for modular app routing.
@@ -69,6 +74,31 @@ const ROUTES = [
     path: "/call",
     component: Call,
     layout: false, // No navbar/layout for call interface
+  },
+  {
+    path: "/interview-setup",
+    component: InterviewSetup,
+    layout: true, // Include navbar for setup
+  },
+  {
+    path: "/interview/:sessionId",
+    component: InterviewRoom,
+    layout: false, // No navbar/layout for interview interface
+  },
+  {
+    path: "/interview-results/:sessionId",
+    component: InterviewResults,
+    layout: true, // Include navbar for results
+  },
+  {
+    path: "/chat-rooms",
+    component: ChatRooms,
+    layout: true,
+  },
+  {
+    path: "/chat-rooms/:roomId",
+    component: ChatRoom,
+    layout: false, // No navbar/layout for chat interface
   },
   // 404 fallback - keep last
   {
