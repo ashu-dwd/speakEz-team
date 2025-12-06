@@ -79,7 +79,14 @@ const interviewSessionSchema = new mongoose.Schema(
         question: String,
         category: {
           type: String,
-          enum: ["technical", "behavioral", "situational", "introduction"],
+          enum: [
+            "technical",
+            "behavioral",
+            "situational",
+            "introduction",
+            "follow_up",
+            "closing",
+          ],
         },
         askedAt: Date,
         userResponse: String,

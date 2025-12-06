@@ -42,6 +42,7 @@ const InterviewRoom = () => {
   // Speech recognition
   const [speechRecognition, setSpeechRecognition] = useState(null);
   const [speechSynthesis, setSpeechSynthesis] = useState(null);
+  const [liveSpeechText, setLiveSpeechText] = useState(""); // Real-time speech display
 
   // Refs
   const userVideoRef = useRef();
@@ -89,10 +90,33 @@ const InterviewRoom = () => {
   // Initialize user media (camera/microphone)
   const initializeMedia = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      // Try to get both video and audio first
+      let mediaStream = null;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        console.log("Successfully accessed camera and microphone");
+      } catch (videoError) {
+        // If video fails, try audio only (microphone is essential for interview)
+        console.warn("Camera not available, trying audio only:", videoError);
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: true,
+          });
+          console.log("Successfully accessed microphone (audio-only mode)");
+          alert(
+            "Camera not found. Interview will continue in audio-only mode. Make sure you have a microphone connected."
+          );
+        } catch (audioError) {
+          console.error("Could not access microphone:", audioError);
+          throw new Error(
+            "Microphone access is required for AI interviews. Please connect a microphone and grant permissions."
+          );
+        }
+      }
 
       setStream(mediaStream);
       if (userVideoRef.current) {
@@ -141,7 +165,10 @@ const InterviewRoom = () => {
       }
     } catch (error) {
       console.error("Error accessing media:", error);
-      alert("Could not access camera/microphone. Please check permissions.");
+      alert(
+        error.message ||
+          "Could not access camera/microphone. Please check permissions and ensure a microphone is connected."
+      );
     }
   };
 
@@ -228,26 +255,85 @@ const InterviewRoom = () => {
       window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
 
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = "en-US";
 
     recognition.onstart = () => {
+      console.log("[Speech Recognition] Started - listening for speech...");
       setIsListening(true);
+      setLiveSpeechText(""); // Clear previous text when starting
+    };
+
+    recognition.onaudiostart = () => {
+      console.log("[Speech Recognition] Audio capturing started");
+    };
+
+    recognition.onsoundstart = () => {
+      console.log("[Speech Recognition] Sound detected");
+    };
+
+    recognition.onspeechstart = () => {
+      console.log("[Speech Recognition] Speech detected - user is speaking");
+    };
+
+    recognition.onspeechend = () => {
+      console.log("[Speech Recognition] Speech ended - user stopped speaking");
+    };
+
+    recognition.onsoundend = () => {
+      console.log("[Speech Recognition] Sound ended");
+    };
+
+    recognition.onaudioend = () => {
+      console.log("[Speech Recognition] Audio capturing ended");
     };
 
     recognition.onresult = (event) => {
-      const speechText = event.results[0][0].transcript;
-      console.log("Speech recognized:", speechText);
-      handleSpeechInput(speechText);
+      console.log("[Speech Recognition] Result event received:", event);
+      
+      // Build the full transcript from all results
+      let interimTranscript = "";
+      let finalTranscript = "";
+      
+      for (let i = 0; i < event.results.length; i++) {
+        const result = event.results[i];
+        const transcript = result[0].transcript;
+        
+        if (result.isFinal) {
+          finalTranscript += transcript + " ";
+          console.log("[Speech Recognition] Final transcript:", transcript);
+          console.log("[Speech Recognition] Confidence:", result[0].confidence);
+        } else {
+          interimTranscript += transcript;
+          console.log("[Speech Recognition] Interim transcript:", transcript);
+        }
+      }
+      
+      // Update live speech text for UI display
+      const displayText = finalTranscript + interimTranscript;
+      setLiveSpeechText(displayText);
+      console.log("[Speech Recognition] Live display:", displayText);
+      
+      // Only send final results to the server
+      if (finalTranscript.trim()) {
+        handleSpeechInput(finalTranscript.trim());
+      }
+    };
+
+    recognition.onnomatch = (event) => {
+      console.warn("[Speech Recognition] No match - speech was detected but could not be recognized:", event);
     };
 
     recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
+      console.error("[Speech Recognition] Error occurred:", event.error);
+      console.error("[Speech Recognition] Error message:", event.message);
+      console.error("[Speech Recognition] Full error event:", event);
       setIsListening(false);
     };
 
     recognition.onend = () => {
+      console.log("[Speech Recognition] Session ended");
       setIsListening(false);
     };
 
@@ -346,18 +432,8 @@ const InterviewRoom = () => {
         setInterviewState("active");
 
         // Join the interview session via socket now that it's active
+        // Server will automatically send welcome message
         joinInterviewSession();
-
-        // AI will send the first question via socket
-        setTimeout(() => {
-          // Trigger first AI response
-          if (socket) {
-            socket.emit("interview-speech", {
-              speechText: "Hello, I'm ready to begin the interview.",
-              questionId: null,
-            });
-          }
-        }, 1000);
       }
     } catch (error) {
       console.error("Error starting interview:", error);
@@ -561,6 +637,22 @@ const InterviewRoom = () => {
                 />
                 <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
                   You {isListening && "(Listening)"}
+                </div>
+                
+                {/* Live Speech Display */}
+                <div className="p-4 bg-base-100 border-t">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-semibold text-base-content/70">Your Speech:</span>
+                    {isListening && (
+                      <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                        <span className="text-xs text-success">Listening...</span>
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-base-content min-h-[3rem] italic">
+                    {liveSpeechText || (isListening ? "Start speaking..." : "Click the microphone button to speak")}
+                  </p>
                 </div>
               </div>
             </div>

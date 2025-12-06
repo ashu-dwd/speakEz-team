@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/axios";
 import { FaArrowRight, FaMicrophone, FaVideo, FaBrain } from "react-icons/fa";
+import { checkInterviewCapabilities } from "../utils/browserCapabilities";
 
 /**
  * Interview Setup Page - Configure preferences before starting interview
@@ -11,6 +12,8 @@ const InterviewSetup = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [preferences, setPreferences] = useState(null);
+  const [browserCapabilities, setBrowserCapabilities] = useState(null);
+  const [showCapabilityWarning, setShowCapabilityWarning] = useState(false);
   const [formData, setFormData] = useState({
     jobType: "software_engineer",
     experienceLevel: "entry",
@@ -19,8 +22,14 @@ const InterviewSetup = () => {
     duration: 30,
   });
 
-  // Load user preferences on component mount
+  // Check browser capabilities and load user preferences on component mount
   useEffect(() => {
+    // Check browser capabilities first
+    const capabilities = checkInterviewCapabilities();
+    setBrowserCapabilities(capabilities);
+    if (!capabilities.allSupported) {
+      setShowCapabilityWarning(true);
+    }
     loadUserPreferences();
   }, []);
 
@@ -66,6 +75,14 @@ const InterviewSetup = () => {
   };
 
   const savePreferences = async () => {
+    // Check browser capabilities before creating session
+    if (browserCapabilities && !browserCapabilities.allSupported) {
+      alert(
+        "Your browser does not support the required features for AI interviews. Please use Chrome, Edge, or Safari."
+      );
+      return;
+    }
+
     setSaving(true);
     try {
       await axios.put("/interviews/preferences", {
@@ -152,6 +169,31 @@ const InterviewSetup = () => {
             experience level
           </p>
         </div>
+
+        {/* Browser Compatibility Warning */}
+        {showCapabilityWarning &&
+          browserCapabilities &&
+          !browserCapabilities.allSupported && (
+            <div className="alert alert-error mb-6">
+              <div>
+                <h3 className="font-bold text-lg">Browser Not Supported</h3>
+                <p className="mt-2">
+                  Your browser does not support the following required features:
+                </p>
+                <ul className="list-disc list-inside mt-2 ml-4">
+                  {browserCapabilities.unsupportedFeatures.map(
+                    (feature, idx) => (
+                      <li key={idx}>{feature}</li>
+                    )
+                  )}
+                </ul>
+                <p className="mt-3 font-semibold">
+                  Please use Chrome, Edge, or Safari to participate in AI
+                  interviews.
+                </p>
+              </div>
+            </div>
+          )}
 
         {/* Setup Form */}
         <div className="card bg-base-100 shadow-xl">
@@ -303,7 +345,11 @@ const InterviewSetup = () => {
               <button
                 onClick={savePreferences}
                 className="btn btn-primary btn-lg"
-                disabled={saving || formData.focusAreas.length === 0}
+                disabled={
+                  saving ||
+                  formData.focusAreas.length === 0 ||
+                  (browserCapabilities && !browserCapabilities.allSupported)
+                }
               >
                 {saving ? (
                   <>

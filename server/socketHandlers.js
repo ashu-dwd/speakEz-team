@@ -207,6 +207,31 @@ export const setupSocketHandlers = (io) => {
         });
 
         console.log(`User ${userId} joined interview session ${sessionId}`);
+
+        // Send automatic welcome message if this is a fresh interview
+        if (session.questions.length === 0 && session.transcript.length === 0) {
+          const welcomeResponse = await generateInterviewResponse(session, `START THE INTERVIEW SESSION AND user prefs: ${JSON.stringify(session.preferences)}`);
+
+          // Add welcome to transcript
+          session.transcript.push({
+            timestamp: new Date(),
+            speaker: "ai",
+            text: welcomeResponse.text,
+            audioUrl: welcomeResponse.audioUrl,
+          });
+
+          await session.save();
+
+          // Send welcome message to client
+          socket.emit("interview-response", {
+            response: welcomeResponse,
+            session: session,
+          });
+
+          console.log(
+            `Sent automatic welcome to user ${userId} in session ${sessionId}`
+          );
+        }
       } catch (error) {
         console.error("Error joining interview:", error);
         socket.emit("interview-error", { message: "Failed to join interview" });
@@ -683,84 +708,146 @@ export const setupSocketHandlers = (io) => {
   };
 
   /**
-   * Generate AI response for interview
+   * Generate AI response for interview using Gemini Service
    */
   const generateInterviewResponse = async (session, userInput) => {
     try {
-      // Get interview questions based on preferences
-      const questions = getInterviewQuestions(session.preferences);
+      console.log("Generating interview response for session:", session);
+      console.log("User input:", userInput);
+      // Import Gemini service
+      const geminiService = (await import("./services/gemini.service.js"))
+        .default;
 
-      // Determine current question or generate follow-up
-      let currentQuestion = null;
-      let responseText = "";
-      let questionId = null;
+      // Prepare conversation history for context
+      const conversationHistory = session.transcript
+        .map((entry) => ({
+          role: entry.speaker === "user" ? "user" : "assistant",
+          content: entry.text,
+        }));
 
-      if (session.questions.length === 0) {
-        // First interaction - ask introduction question
-        currentQuestion = questions.introduction;
-        responseText = currentQuestion.question;
-        questionId = currentQuestion.id;
+      const preferences = session.preferences;
+      const focusAreas = preferences.focusAreas || [];
+      const questionsAsked = session.questions.length;
 
-        // Add question to session
-        session.questions.push({
-          questionId: questionId,
-          question: responseText,
-          category: "introduction",
-          askedAt: new Date(),
-        });
-      } else if (session.currentQuestion < questions.technical.length) {
-        // Ask technical questions
-        currentQuestion = questions.technical[session.currentQuestion];
-        responseText = currentQuestion.question;
-        questionId = currentQuestion.id;
+      // Determine the category for the next question
+      let category = "introduction";
+      let instruction = "";
 
-        session.questions.push({
-          questionId: questionId,
-          question: responseText,
-          category: "technical",
-          askedAt: new Date(),
-        });
+      if (questionsAsked === 0) {
+        // First question - welcome and introduction
+        category = "introduction";
+        instruction = `This is the very first message to the candidate. Welcome them warmly and ask them to introduce themselves. Mention the role (${preferences.jobType}) and ask about their background and experience.`;
+      } else if (questionsAsked < 3 && focusAreas.includes("technical_skills")) {
+        // Technical questions
+        category = "technical";
+        instruction = `Ask a ${preferences.difficulty} level technical question relevant to ${preferences.jobType} at the ${preferences.experienceLevel} experience level. Base your question on their previous answer if relevant.`;
       } else if (
-        session.currentQuestion <
-        questions.technical.length + questions.behavioral.length
+        questionsAsked >= 3 &&
+        questionsAsked < 6 &&
+        focusAreas.includes("behavioral")
       ) {
-        // Ask behavioral questions
-        const behavioralIndex =
-          session.currentQuestion - questions.technical.length;
-        currentQuestion = questions.behavioral[behavioralIndex];
-        responseText = currentQuestion.question;
-        questionId = currentQuestion.id;
-
-        session.questions.push({
-          questionId: questionId,
-          question: responseText,
-          category: "behavioral",
-          askedAt: new Date(),
-        });
+        // Behavioral questions
+        category = "behavioral";
+        instruction = `Ask a behavioral interview question appropriate for a ${preferences.jobType} position. Focus on teamwork, conflict resolution, or past experiences.`;
+      } else if (questionsAsked < 8) {
+        // Mix of follow-up questions
+        category = "follow_up";
+        instruction = `Based on the candidate's last answer, ask a relevant follow-up question to dive deeper or explore related topics.`;
       } else {
-        // Generate follow-up or closing
-        responseText = generateFollowUpResponse(session, userInput);
+        // Closing
+        category = "closing";
+        instruction = `Thank the candidate for their time and ask if they have any questions for you or if there's anything they'd like to add.`;
       }
+
+      // Create the system context
+      const systemContext = `You are conducting a professional interview for a ${preferences.jobType} position with a candidate at the ${preferences.experienceLevel} level. The interview difficulty is ${preferences.difficulty}.
+
+IMPORTANT GUIDELINES:
+- Keep your response concise (1-3 sentences max)
+- Be professional but friendly
+- Ask only ONE question at a time
+- DO NOT include any labels like "AI:" or "INTERVIEWER:"
+- Respond in plain text, ready to be spoken aloud
+- If the candidate gave a good answer, briefly acknowledge it before the next question
+- Make questions relevant to ${preferences.jobType}`;
+
+      // Create the current instruction
+      const currentInstruction = `${instruction}
+
+Generate your interview question or response now.`;
+
+      // Call Gemini service
+      const responseText = await geminiService.generateContextualResponse(
+        systemContext,
+        conversationHistory,
+        currentInstruction,
+        { temperature: 0.8, maxTokens: 500 }
+      );
+      console.log("Generated response:", responseText);
+
+      // Clean up any potential labels or formatting
+      const cleanedResponse = responseText
+        .replace(/^(AI|INTERVIEWER|ASSISTANT):\s*/i, "")
+        .replace(/^\*\*.*?\*\*:?\s*/g, "")
+        .trim();
+
+      // Generate question ID
+      const questionId = `q_${Date.now()}_${questionsAsked}`;
+
+      // Add question to session
+      session.questions.push({
+        questionId: questionId,
+        question: cleanedResponse,
+        category: category,
+        askedAt: new Date(),
+      });
 
       session.currentQuestion += 1;
       await session.save();
 
-      // Generate audio URL (placeholder - would integrate with TTS service)
-      const audioUrl = null; // Will be implemented with actual TTS service
+      console.log(`Generated ${category} question using Gemini Service`);
 
       return {
-        text: responseText,
-        audioUrl: audioUrl,
+        text: cleanedResponse,
+        audioUrl: null, // Browser TTS handles audio
         questionId: questionId,
-        feedback: generateFeedback(userInput),
+        feedback: userInput
+          ? generateFeedback(userInput)
+          : "Let's get started!",
       };
     } catch (error) {
-      console.error("Error generating interview response:", error);
+      console.error("Error generating AI interview response:", error);
+
+      // Fallback to basic question if Gemini fails
+      const fallbackQuestions = {
+        0: "Hello! Thank you for joining this interview. To get started, could you please tell me about yourself and your background?",
+        1: "That's great! Can you share a specific project or achievement you're particularly proud of?",
+        2: "Interesting! What challenges did you face and how did you overcome them?",
+        3: "Thank you for sharing. How do you approach teamwork and collaboration?",
+        default:
+          "Could you tell me more about your experience and what you're looking for in your next role?",
+      };
+
+      const questionIndex = session.questions.length;
+      const fallbackText =
+        fallbackQuestions[questionIndex] || fallbackQuestions.default;
+
+      const questionId = `fallback_${Date.now()}`;
+      session.questions.push({
+        questionId: questionId,
+        question: fallbackText,
+        category: "introduction",
+        askedAt: new Date(),
+      });
+
+      session.currentQuestion += 1;
+      await session.save();
+
       return {
-        text: "I apologize, but I encountered an error. Could you please repeat your answer?",
+        text: fallbackText,
         audioUrl: null,
-        questionId: null,
-        feedback: "There was a technical issue processing your response.",
+        questionId: questionId,
+        feedback: "Let's continue with the interview.",
       };
     }
   };
